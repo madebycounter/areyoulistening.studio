@@ -1,0 +1,80 @@
+
+<!doctype html>
+
+<html>
+    <head>
+        <title>areyoulistening? - checkout</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        
+        <link rel="icon" href="/static/ico/favicon_2.ico" type="image/x-icon">
+
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Questrial&display=swap"> 
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ubuntu+Mono&display=swap">
+        <link rel="stylesheet" href="/static/css/util.css">
+        <link rel="stylesheet" href="/static/css/checkout.css">
+    </head>
+
+    <body>
+        <div class="checkout">
+            
+            <span class="title">your order</span>
+            <div id="mockup_loader" class="relative">
+                <img class="spinner" src="/static/img/spinner.svg">
+            </div>
+            <img id="mockup" class="hidden" src="/api/order/mockup/{{ order_id }}?width=700">
+
+            <br/>
+
+            <div id="form" style="text-align: left;">
+                <div class="inputbox">
+                    <span style="margin-left: 10px;" class="descriptor">select a size:</span>
+                    <select class="input" name="size" id="size" style="float: right;">
+                        <option id="default" value="none" selected></option>
+                        <option value="small">Small</option>
+                        <option value="medium">Medium</option>
+                        <option value="large">Large</option>
+                        <option value="extralarge">Extra Large</option>
+                    </select>
+                </div>
+
+                <table>
+                    <tr>
+                        <th class="dashed">price</th>
+                        <td class="dashed">$32.00</td>
+                    </tr>
+                    <tr>
+                        <th class="dashed">shipping</th>
+                        <td class="dashed" style="color: green">Free</td>
+                    </tr>
+                    <tr>
+                        <th class="dashed">discount</th>
+                        <td class="dashed" style="color: green">-25%</td>
+                    </tr>
+                </table>
+
+                <table class="highlight">
+                    <tr>
+                        <th>total</th>
+                        <td>$24.00</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <div class="checkout hidden" id="paypal_checkout">
+            <span class="title" style="font-size: 1.5rem; display: block;">checkout via paypal</span>
+            <span class="tos">by purchasing, you agree to our <a href="/tos" target="_blank">terms of service</a></span>
+            <br/><br/>
+            <div id="paypal_buttons"></div>
+
+        </div>
+    </body>
+
+    <script>var ORDER_ID = "{{ order_id }}"</script>
+    <script src="https://www.paypal.com/sdk/js?client-id=AcquidsfeLm8vmvBSYLWAPr754rkUMie_CBYuC3Cyb0CS073IDyHvAVX0uIPMQTJhWtJnz3xdbS-IIcc&currency=USD&disable-funding=credit" data-sdk-integration-source="button-factory"></script>
+    <script src="/static/js/jquery-3.5.1.min.js"></script>
+    <script src="/static/js/checkout.js"></script>
+
+    <script>
+    </script>
+</html>
