@@ -4,15 +4,19 @@ import json
 import time
 import random
 import io
+import os
 
-lastfm = LastFM(config['lastfm']['api_key'], cache=config['lastfm']['cache'])
-imgcache = ImageCache(data=config['covers']['data_file'], dump=config['covers']['dump_dir'])
+here = os.path.dirname(__file__)
+def path(rel): return os.path.join(here, rel)
+
+lastfm = LastFM(path, config['lastfm']['api_key'], cache=config['lastfm']['cache'])
+imgcache = ImageCache(path, data=config['covers']['data_file'], dump=config['covers']['dump_dir'])
 paypal = Paypal(config['paypal']['client_id'], config['paypal']['client_secret'], api_url=config['paypal']['api_url'])
 mailer = Mailer(config['mailgun']['api_key'], config['mailgun']['api_domain'], api_url=config['mailgun']['api_url'])
 database = Database(host=config['database']['host'], username=config['database']['username'],
                     password=config['database']['password'], database=config['database']['database'])
 
-app = Flask(__name__, template_folder=config['templates_folder'])
+app = Flask(__name__, template_folder=path(config['templates_folder']))
 
 # THE API
 @app.route('/api/search/<query>', methods=['GET'])
@@ -43,7 +47,7 @@ def api_mockup(order_id):
     if not design: return abort(404)
 
     img_io = io.BytesIO()
-    mockup = printmachine.create_mockup(design, 'static/img/blank_black_2500.png', 'static/img/title_white.png')
+    mockup = printmachine.create_mockup(design, path('static/img/blank_black_2500.png'), path('static/img/title_white.png'))
 
     if width: mockup = printmachine.resize_image(mockup, width=int(width))
 
@@ -86,7 +90,7 @@ def api_order_process(paypal_id, order_id, size):
         email = config['emails']['confirmation']
         mailer.send_message(
             data['email'], email['name'], email['sender'],
-            email['subject'], open(email['body_file'], 'r').read(),
+            email['subject'], open(path(email['body_file']), 'r').read(),
             base_url=config['base_url'], **data
         )
 
