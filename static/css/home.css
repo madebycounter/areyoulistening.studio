@@ -18,7 +18,8 @@ img.title {
 }
 
 .button {
-    font-family: 'Questrial', sans-serif;
+    /* font-family: 'Questrial', sans-serif; */
+    font-family: 'Ubuntu Mono', monospace;
     margin-right: 10px;
     margin-bottom: 10px;
     background: none;
