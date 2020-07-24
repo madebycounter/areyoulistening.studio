@@ -4,6 +4,10 @@ import json
 import time
 import random
 import io
+import os
+
+with open(os.environ['AYL_CONFIG'], 'r') as f:
+    config = json.load(f)
 
 lastfm = LastFM(config['lastfm']['api_key'], cache=config['lastfm']['cache'])
 imgcache = ImageCache(data=config['covers']['data_file'], dump=config['covers']['dump_dir'])
