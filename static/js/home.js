@@ -154,7 +154,7 @@ function update_squares() {
 }
 
 // desktop
-var is_desktop = true
+var is_desktop = false
 function desktop_render() {
     var right_width = $(window).width() - $('#search').width()
     var max_height = $(window).height() - $('#header').height() - 30
@@ -241,6 +241,8 @@ function disable_close_view() {
 }
 
 function update_display() {
+    is_desktop = $(window).width() > 1050
+
     if (is_desktop) desktop_render()
     $('#design').height($('#shirt').height())
     

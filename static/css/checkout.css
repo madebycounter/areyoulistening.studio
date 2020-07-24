@@ -102,3 +102,12 @@ td {
 .tos a {
     color: grey;
 }
+
+
+
+@media  (min-width: 1050px) {
+    .checkout {
+        max-width: 400px;
+        float: left;
+    }
+}
