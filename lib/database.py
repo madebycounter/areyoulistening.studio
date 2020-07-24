@@ -50,7 +50,7 @@ class Database:
             cur.close()
         return True, 'success'
     
-    def new_internal_id(self, length=8):
+    def new_internal_id(self, length=16):
         conn, cur = self.generate_connection()
 
         results = [(1,)]
