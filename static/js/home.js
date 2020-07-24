@@ -42,7 +42,7 @@ function update_albums(list) {
         $(elem).on('click', (e) => {
             selected_album = elem;
             enable_close_view()
-            disable_fullscreen_search()
+            // disable_fullscreen_search()
         })
     })
 
@@ -67,8 +67,9 @@ $('#query').keypress((event) => {
 var config = {
     layout: { h: 3, v: 3 },
     offset: { x: 0, y: 260 },
+    zoom_offset: -10,
     size: 83,
-    gap: 10
+    gap: 10,
 }
 
 function get_square(x, y) {
@@ -166,9 +167,28 @@ var close_enabled = false;
 var currently_zooming = false;
 function enable_close_view() {
     currently_zooming = true;
-    $('#shirt').animate({ width: '2600px' }, {
+
+    var shirt_top = $('#shirt').offset().top + document.body.scrollTop
+    console.log(shirt_top)
+    var target_width = 1000
+
+    var middle = ($(window).width() / 2) + config.offset.x
+    var height = target_width
+    var size = height * config.size / 1000
+    var gap = height * config.gap / 1000
+
+    var top_left = {
+        y: height * config.offset.y / 1000
+    }
+
+    var scroll_target = top_left.y + (1 * (size + gap)) + shirt_top - ($(window).height() / 2)
+    $('html, body').animate({ scrollTop: scroll_target + config.zoom_offset })
+    $('#shirt').animate({ width: target_width }, {
         progress: update_display,
-        complete: () => { close_enabled = true; currently_zooming = false }
+        complete: () => {
+            close_enabled = true
+            currently_zooming = false
+        }
     })
 
     if (selected_album) {
@@ -185,6 +205,8 @@ function disable_close_view() {
         progress: update_display,
         complete: () => { close_enabled = false; currently_zooming = false }
     })
+
+    $('html, body').animate({ scrollTop: 0 })
 
     $('#help').addClass('hidden')
 }

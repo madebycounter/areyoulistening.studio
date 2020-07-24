@@ -19,28 +19,29 @@ img.title {
 
 .button {
     font-family: 'Questrial', sans-serif;
-    margin-right: 20px;
-    margin-bottom: 30px;
+    margin-right: 10px;
+    margin-bottom: 10px;
     background: none;
     border-radius: 5px;
     border: none;
-    border: black 4px solid;
-    box-shadow: 2px 2px 4px black;
+    border: black 1px solid;
+    box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
 }
 
 .button.action {
     float: right;
     font-weight: bold;
-    font-size: 3rem;
-    padding: 1rem;
+    font-size: 1.3rem;
+    padding: 0.5rem;
 }
 
 .button.dialogue {
-    font-size: 2.5rem;
-    padding: 0.5rem;
-    min-width: 8rem;
+    font-size: 1rem;
+    padding: 0.4rem;
+    margin-bottom: 0px;
+    min-width: 3rem;
     font-weight: bold;
-    border: black 3px solid;
+    border: black 1px solid;
 }
 
 .album {
@@ -60,7 +61,7 @@ img.title {
 
 .tooltip {
     font-family: 'Ubuntu Mono', monospace;
-    font-size: 2rem;
+    font-size: 0.8rem;
     text-align: center;
     margin: 10px;
 }
@@ -75,6 +76,7 @@ img.title {
     margin: 0px;
     top: 50%;
     left: 50%;
+    width: 6rem;
 }
 
 /* MISC ELEMENTS */
@@ -96,14 +98,13 @@ img.title {
 #query {
     font-family: 'Questrial', sans-serif;
     padding: 10px;
-    margin-bottom: 30px;
-    font-size: 4rem;
+    margin: 15px;
+    font-size: 1.5rem;
     background: none;
     color: white;
     border: none;
-    border-bottom: white 3px solid;
-    width: calc(100% - 60px);
-    margin: 20px;
+    border-bottom: white 1px solid;
+    width: calc(100% - 50px);
 }
 
 #query::placeholder {
@@ -116,7 +117,7 @@ img.title {
 
 #noresult {
     color: white;
-    font-size: 4rem;
+    font-size: 1.2rem;
     text-align: center;
     font-style: italic;
 }
@@ -139,7 +140,7 @@ img.title {
 .segment {
     width: 100% !important;
     background-color: white;
-}
+}  
 
 #header {
     /* background-color: orange; */
@@ -171,7 +172,7 @@ img.title {
     width: 100%;
     bottom: 0px;
     left: 0px;
-    margin-bottom: 50px;
+    margin-bottom: 20px;
 }
 
 /* MODALS!!!! :D */
@@ -187,18 +188,33 @@ img.title {
 }
 
 .modal .content {
-    width: calc(100% - 200px);
+    width: calc(100% - 20px - 60px);
     position: absolute;
-    top: 400px;
-    margin: auto;
+    top: 100px;
     left: -9999px;
     right: -9999px;
-    font-size: 1.4rem;
-
+    font-size: 0.5rem;
+    
+    margin: auto;
     padding: 20px;
+    padding-right: 20px;
 
     background-color: white;
-    border: black 4px solid;
+    border: black 2px solid;
     border-radius: 5px;
-    box-shadow: 8px 8px 4px rgba(0, 0, 0, 0.4);
+    /* box-shadow: 2px 2px 2px black; */
+    box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.modal .content h1 {
+    margin-top: 0px;
+}
+
+
+
+
+@media  (min-width: 768px) {
+    .segment {
+        background-color: red;
+    }
 }

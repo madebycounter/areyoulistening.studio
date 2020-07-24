@@ -2,8 +2,9 @@
 
 <html>
     <head>
-        <title>ayl? - checkout</title>
-        
+        <title>ayl? - design your shirt</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+  
         <link rel="icon" href="/static/ico/favicon_new.ico" type="image/x-icon">
 
         <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Questrial&display=swap"> 
@@ -14,20 +15,22 @@
     </head>
 
     <body>
-        <div id="header" class="segment">
-            <img class="title" src="/static/img/title.png">
-        </div>
-
-        <div id="design" class="segment">
-            <img id="shirt" src="/static/img/blank_black_2500.png">
-
-            <div id="squares" class="relative"></div>
-            <img id="shirt_title" src="/static/img/title_white.png">
-        </div>
-
-        <div id="actions" class="segment">
-            <button id="order" class="button nofocus action">order</button>
-            <button id="reset" class="button nofocus action">reset</button>
+        <div class="upper">
+            <div id="header" class="segment">
+                <img class="title" src="/static/img/title.png">
+            </div>
+    
+            <div id="design" class="segment">
+                <img id="shirt" src="/static/img/blank_black_2500.png">
+    
+                <div id="squares" class="relative"></div>
+                <img id="shirt_title" src="/static/img/title_white.png">
+            </div>
+    
+            <div id="actions" class="segment">
+                <button id="order" class="button nofocus action">order</button>
+                <button id="reset" class="button nofocus action">reset</button>
+            </div>
         </div>
 
         <div id="search" class="segment">
@@ -47,7 +50,7 @@
 
         <div class="modal" id="confirm_reset" onclick="close_modal('confirm_reset')">
             <div class="content">
-                <h1 style="padding-left: 30px;">Are you sure you want to reset your design?</h1>
+                <h1>Are you sure you want to reset your design?</h1>
                 <div style="text-align: right;">
                     <button onclick="close_modal('confirm_reset');reset_squares()" class="button dialogue nofocus">yes</button>
                     <button onclick="close_modal('confirm_reset')" class="button dialogue nofocus">no</button>
@@ -57,7 +60,7 @@
 
         <div class="modal" id="confirm_incomplete" onclick="close_modal('confirm_incomplete')">
             <div class="content">
-                <h1 style="padding-left: 30px;">Your shirt is incomplete, are you sure you want to order?</h1>
+                <h1>Your shirt is incomplete, are you sure you want to order?</h1>
                 <div style="text-align: right;">
                     <button onclick="close_modal('confirm_incomplete');generate_order()" class="button dialogue nofocus">yes</button>
                     <button onclick="close_modal('confirm_incomplete')" class="button dialogue nofocus">no</button>
