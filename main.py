@@ -112,6 +112,10 @@ def index():
 def checkout(order_id):
     return render_template('checkout.html', order_id=order_id)
 
+@app.route('/complete/<order_id>', methods=['GET'])
+def complete(order_id):
+    return render_template('complete.html', order_id=order_id)
+
 @app.route('/info/<order_id>', methods=['GET'])
 def info(order_id):
     exists, details = database.get_order_details(order_id)

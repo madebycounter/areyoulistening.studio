@@ -1,16 +1,41 @@
-<style>
-    th {
-        text-align: right;
-        padding-right: 20px;
-    }
-</style>
+<!doctype html>
 
-<h1>#{{ details['internal_id'] }}</h1>
-<table>
-    {% for key, value in details.items() %}
-        <tr>
-            <th>{{ key }}</th>
-            <td>{{ value }}</td>
-        </tr>
-    {% endfor %}
-</table>
+<html>
+    <head>
+        <title>ARE YOU LISTENING</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        
+        <link rel="icon" href="/static/ico/favicon_new.ico" type="image/x-icon">
+
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Questrial&display=swap"> 
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ubuntu+Mono&display=swap">
+        <link rel="stylesheet" href="/static/css/util.css">
+    </head>
+
+    <style>
+        body {
+            font-family: 'Ubuntu Mono', monospace;
+            margin-left: 30px;
+        }
+
+        th {
+            text-align: right;
+            padding-right: 20px;
+        }
+    </style>
+
+    <body>
+        <h1>Order #{{ details['internal_id'] }}</h1>
+        <table>
+            {% for key, value in details.items() %}
+                <tr>
+                    <th>{{ key }}</th>
+                    <td>{{ value }}</td>
+                </tr>
+            {% endfor %}
+        </table>
+    </body>
+</html>
+
+
+

@@ -37,6 +37,7 @@ paypal.Buttons({
     },
 
     onApprove: (data, actions) => {
+        present_modal('modal_processing')
         actions.order.capture().then((details) => {
             var size = $('select').val()
             $.ajax({
@@ -44,7 +45,12 @@ paypal.Buttons({
                 url: '/api/order/process/' + details.id + '/' + ORDER_ID + '/' + size,
                 dataType: 'json',
                 success: (resp) => {
-                    console.log(resp)
+                    if (!resp.success) {
+                        $('#error_message').text(resp.message)
+                        present_modal('modal_error')
+                    } else {
+                        window.location.href = '/complete/' + ORDER_ID
+                    }
                 }
             })
         });

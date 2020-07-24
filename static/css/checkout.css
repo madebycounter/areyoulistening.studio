@@ -103,7 +103,15 @@ td {
     color: grey;
 }
 
+.modal {
+    /* because paypal buttons push themselves to the top :\ */
+    z-index: 100; 
+}
 
+.modal .content {
+    /* font-family: 'Questrial', sans-serif; */
+    font-family: 'Ubuntu Mono', monospace;
+}
 
 @media  (min-width: 1050px) {
     .checkout {

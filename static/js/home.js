@@ -267,15 +267,6 @@ $(window).on('load', () => {
 
 get_top_albums(update_albums)
 
-// MODALS
-function close_modal(id) {
-    $(`#${id}`).css('display', 'none')
-}
-
-function present_modal(id) {
-    $(`#${id}`).css('display', 'block')
-}
-
 var order_id;
 function generate_order() {
     present_modal('confirm_order')
