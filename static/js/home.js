@@ -130,7 +130,7 @@ function reset_squares() {
 }
 
 function update_squares() {
-    var middle = ($(window).width() / 2) + config.offset.x
+    var middle = ($('#design').width() / 2) + config.offset.x
     var height = $('#shirt').height()
     var size = height * config.size / 1000
     var gap = height * config.gap / 1000
@@ -150,6 +150,23 @@ function update_squares() {
             get_square(x, y).css('height', size)
             get_square(x, y).css('width', size)
         }
+    }
+}
+
+// desktop
+var is_desktop = true
+function desktop_render() {
+    var right_width = $(window).width() - $('#search').width()
+    var max_height = $(window).height() - $('#header').height() - 30
+
+    $('#header').css('right', (right_width - $('#header').width()) / 2)
+    $('#header').css('display', 'block')
+    $('#help').css('left', $('#search').width() + 20)
+
+    if (right_width - 20 < max_height) $('#design').width(right_width - 20)
+    else {
+        $('#design').width(max_height)
+        $('#design').css('right', (right_width - max_height) / 2)
     }
 }
 
@@ -182,14 +199,20 @@ function enable_close_view() {
     }
 
     var scroll_target = top_left.y + (1 * (size + gap)) + shirt_top - ($(window).height() / 2)
-    $('html, body').animate({ scrollTop: scroll_target + config.zoom_offset })
-    $('#shirt').animate({ width: target_width }, {
-        progress: update_display,
-        complete: () => {
-            close_enabled = true
-            currently_zooming = false
-        }
-    })
+
+    if (!is_desktop) {
+        $('html, body').animate({ scrollTop: scroll_target + config.zoom_offset })
+        $('#shirt').animate({ width: target_width }, {
+            progress: update_display,
+            complete: () => {
+                close_enabled = true
+                currently_zooming = false
+            }
+        })
+    } else {
+        close_enabled = true
+        currently_zooming = false
+    }
 
     if (selected_album) {
         var title = $(selected_album).attr('title')
@@ -201,18 +224,26 @@ function enable_close_view() {
 
 function disable_close_view() {
     currently_zooming = true;
-    $('#shirt').animate({ width: '100%' }, {
-        progress: update_display,
-        complete: () => { close_enabled = false; currently_zooming = false }
-    })
 
-    $('html, body').animate({ scrollTop: 0 })
+    if (!is_desktop) {
+        $('#shirt').animate({ width: '100%' }, {
+            progress: update_display,
+            complete: () => { close_enabled = false; currently_zooming = false }
+        })
+
+        $('html, body').animate({ scrollTop: 0 })
+    } else {
+        close_enabled = false
+        currently_zooming = false
+    }
 
     $('#help').addClass('hidden')
 }
 
 function update_display() {
+    if (is_desktop) desktop_render()
     $('#design').height($('#shirt').height())
+    
     update_squares()
 }
 
