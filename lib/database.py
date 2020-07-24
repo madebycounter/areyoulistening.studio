@@ -19,12 +19,14 @@ class Database:
         self.floated_ids = []
 
     def generate_connection(self):
-        return mysql.connector.connect(
+        conn = mysql.connector.connect(
             host=self.host,
             user=self.username,
             password=self.password,
             database=self.database
         )
+
+        return conn, conn.cursor()
     
     def make_new_order(self, 
             paypal_id=None, internal_id=None, order_status=None, first_name=None,
@@ -33,8 +35,7 @@ class Database:
             shirt_size=None):
 
         try:
-            conn = self.generate_connection()
-            cur = conn.cursor()
+            conn, cur = self.generate_connection()
             values = '(`paypal_id`, `internal_id`, `order_status`, `create_time`, `first_name`, `last_name`, `email`, `payer_id`, `total`, `shipping_name`, `address_1`, `address_2`, `state`, `city`, `zip_code`, `shirt_size`)'
             query = 'INSERT INTO `orders` ' + values + ' VALUES (' + ('%s,' * 16)[:-1] + ')'
             cur.execute(query, \
@@ -50,8 +51,7 @@ class Database:
         return True, 'success'
     
     def new_internal_id(self, length=8):
-        conn = self.generate_connection()
-        cur = conn.cursor()
+        conn, cur = self.generate_connection()
 
         results = [(1,)]
         internal_id = None
@@ -70,8 +70,7 @@ class Database:
                 album_info.append('%s|%s|%s' % (albums[x][y]['title'], albums[x][y]['artist'], albums[x][y]['image']))
 
         try:
-            conn = self.generate_connection()
-            cur = conn.cursor()
+            conn, cur = self.generate_connection()
             cur.execute('''
                 INSERT INTO images VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
             ''', (internal_id, image_to_byte_array(image), True) + tuple(album_info))
@@ -87,8 +86,7 @@ class Database:
         return True, 'success'
     
     def get_image_data(self, internal_id):
-        conn = self.generate_connection()
-        cur = conn.cursor()
+        conn, cur = self.generate_connection()
         cur.execute('''SELECT image FROM `images` WHERE internal_id=%s''', (internal_id,))
         results = cur.fetchall()
         conn.close()
@@ -99,8 +97,7 @@ class Database:
         else: return results[0][0]
     
     def delete_image_data(self, internal_id):
-        conn = self.generate_connection()
-        cur = conn.cursor()
+        conn, cur = self.generate_connection()
         cur.execute('''
             UPDATE `images` SET image=%s, has_blob=%s WHERE internal_id=%s
         ''', (None, False, internal_id))
@@ -109,14 +106,43 @@ class Database:
         cur.close()
     
     def image_data_exists(self, internal_id):
-        conn = self.generate_connection()
-        cur = conn.cursor()
+        conn, cur = self.generate_connection()
         cur.execute('''SELECT count(*) FROM `images` WHERE internal_id=%s AND has_blob=1''', (internal_id,))
         results = cur.fetchall()
         conn.close()
         cur.close()
 
         return bool(results[0][0])
+    
+    def get_order_details(self, internal_id):
+        conn, cur = self.generate_connection()
+        cur.execute('''SELECT * FROM `orders` WHERE internal_id=%s''', (internal_id,))
+        results = cur.fetchall()
+        conn.close()
+        cur.close()
+
+        if len(results) == 0:
+            return False, {}
+        else:
+            return True, {
+                'paypal_id': results[0][0],
+                'internal_id': results[0][1],
+                'order_status': results[0][2],
+                'create_time': results[0][3],
+                'first_name': results[0][4],
+                'last_name': results[0][5],
+                'email': results[0][6],
+                'payer_id': results[0][7],
+                'total': results[0][8],
+                'shipping_name': results[0][9],
+                'address_1': results[0][10],
+                'address_2': results[0][11],
+                'state': results[0][12],
+                'city': results[0][13],
+                'zip_code': results[0][14],
+                'shirt_size': results[0][15]
+            }
+
 
 # mydb = Database(
 #     host="areyoulistening.studio",

@@ -90,7 +90,7 @@ def api_order_process(paypal_id, order_id, size):
             base_url=config['base_url'], **data
         )
 
-        embed = webhooks.build_new_order(oder_id, first_name, last_name, config['base_url'])
+        embed = webhooks.build_new_order(order_id, data['first_name'], data['last_name'], config['base_url'])
         webhooks.send_webhook(config['webhook'], embed)
 
     return json.dumps({
@@ -107,6 +107,12 @@ def index():
 @app.route('/checkout/<order_id>', methods=['GET'])
 def checkout(order_id):
     return render_template('checkout.html', order_id=order_id)
+
+@app.route('/info/<order_id>', methods=['GET'])
+def info(order_id):
+    exists, details = database.get_order_details(order_id)
+    if not exists: abort(404)
+    else: return render_template('info.html', details=details)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8104, debug=True)

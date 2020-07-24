@@ -11,7 +11,9 @@ def build_new_order(order_id, first_name, last_name, base_url):
     image_url = base_url + '/api/order/mockup/' + order_id + '?width=400'
     title = '#%s' % order_id
     description = '%s %s' % (first_name, last_name)
+    info_url = base_url + '/info/' + order_id
 
     embed = DiscordEmbed(title=title, description=description)
     embed.set_image(url=image_url)
+    embed.set_url(url=info_url)
     return embed
