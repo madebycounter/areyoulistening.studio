@@ -1,4 +1,4 @@
-from lib import config, LastFM, ImageCache, Paypal, Database, Mailer, printmachine, webhooks, handle_order
+from lib import LastFM, ImageCache, Paypal, Database, Mailer, printmachine, webhooks, handle_order
 from flask import Flask, render_template, request, send_file, make_response, abort
 import json
 import time
