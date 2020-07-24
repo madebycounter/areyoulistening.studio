@@ -105,4 +105,5 @@ def index():
 def checkout(order_id):
     return render_template('checkout.html', order_id=order_id)
 
-app.run(host='0.0.0.0', port=8104, debug=True)
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=8104, debug=True)
