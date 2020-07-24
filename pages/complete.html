@@ -18,6 +18,36 @@
             text-align: center;
         }
 
+        .insta {
+            position: absolute;
+            top: 5px;
+            left: 35px;
+            font-family: 'Questrial', sans-serif;
+            font-weight: bold;
+            font-size: 1.2rem;
+            /* float: right; */
+            /* text-align: center; */
+        }
+
+        .insta a {
+            color: black;
+            text-decoration: none;
+        }
+        
+        div.inner {
+            width: 238px;
+            height: 30px;
+            position: relative;
+            margin:0 auto;
+        }
+
+        img {
+            width: 30px;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
         p {
             font-family: 'Ubuntu Mono', monospace;
             text-align: justify;
@@ -25,10 +55,16 @@
             max-width: 300px;
             margin:0 auto;
         }
+
+
+        hr {
+            max-width: 320px;
+            /* border: black 1px solid; */
+        }
     </style>
 
     <body>
-        <h1>Thank you for your order!</h1>
+        <h1>Your order has been placed</h1>
         <p>
             Thank you for your purchase! Our shirts are printed locally here in California,
             so please be patient while we print and ship your order (7-10 days). You will
@@ -38,7 +74,22 @@
         <br/>
 
         <p>
-            Order details: <a href="/info/{{ order_id }}"><code>here</code></a>
+            While you wait, why not check out our instagram for more 
+            music related content or a chance to get featured.
+        </p>
+
+        <br/>
+
+        <div class="inner">
+            <img src="/static/img/instagram.svg">
+            <span class="insta"><a href="https://www.instagram.com/areyoulistening.studio/" target="_blank">@areyoulistening.studio</a></span>
+        </div>        
+
+        <br/>
+        <hr/>
+
+        <p>
+            Order details: <a href="/info/{{ order_id }}" target="_blank"><code>here</code></a>
         </p>
 
         <p>
