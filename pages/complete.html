@@ -56,6 +56,11 @@
             margin:0 auto;
         }
 
+        p.left {
+            text-align: left;
+            font-size: 1rem;
+        }
+
 
         hr {
             max-width: 320px;
@@ -88,11 +93,11 @@
         <br/>
         <hr/>
 
-        <p>
+        <p class="left">
             Order details: <a href="/info/{{ order_id }}" target="_blank"><code>here</code></a>
         </p>
 
-        <p>
+        <p class="left">
             Reference number: <code>{{ order_id }}</code>
         </p>
 
