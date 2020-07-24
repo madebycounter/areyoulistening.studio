@@ -1,0 +1,60 @@
+{
+    "lastfm": {
+        "api_key": "",
+        "cache": "cache/lastfm.dat"
+    },
+
+    "design": {
+        "design_size": 2.75,
+        "design_gap": 0.375,
+        "album_size": 300,
+        "album_layout": [3, 3],
+        "background": [0, 0, 0, 0],
+        "border": [0, 0, 0],
+        "border_size": 0
+    },
+
+    "mockup": {
+        "blank": "static/img/blank_black_2500.png",
+        "logo": "static/img/title_white.png"
+    },
+
+    "covers": {
+        "dump_dir": "cache/covers/",
+        "data_file": "cache/covers.dat"
+    },
+
+    "paypal": {
+        "client_id": "",
+        "client_secret": "",
+        "api_url": "https://api.sandbox.paypal.com"
+    },
+
+    "database": {
+        "host": "",
+        "username": "",
+        "password": "",
+        "database": ""
+    },
+
+    "mailgun": {
+        "api_key": "",
+        "api_url": "https://api.mailgun.net/v3",
+        "api_domain": ""
+    },
+
+    "emails": {
+        "confirmation": {
+            "subject": "areyoulistening invoice",
+            "sender": "noreply",
+            "name": "AYL Team",
+            "body_file": "emails/confirmation.html"
+        }
+    },
+
+    "templates_folder": "pages/",
+
+    "base_url": "",
+    "webhook": "",
+    "order_price": 24.00
+}
