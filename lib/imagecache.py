@@ -6,8 +6,7 @@ import json
 import time
 
 class ImageCache:
-    def __init__(self, path, data='images.dat', dump='images/', domains=[], verbose=True, cache_age=86400):
-        self.path = path
+    def __init__(self, data='images.dat', dump='images/', domains=[], verbose=True, cache_age=86400):
         self._data_path = data
         self._dump_path = dump
         self._default_data = {'images': {}}
@@ -25,7 +24,7 @@ class ImageCache:
             self.data = self._default_data
             self._save_data()
         else:
-            with open(self.path(self._data_path), 'r') as f:
+            with open(self._data_path, 'r') as f:
                 try:
                     self.data = json.load(f)
                     self._log('Data file loaded from \'%s\'' % self._data_path)
@@ -42,7 +41,7 @@ class ImageCache:
         if self.verbose: print('[ImageCache]', *args, **kwargs)
     
     def _save_data(self):
-        with open(self.path(self._data_path), 'w+') as f:
+        with open(self._data_path, 'w+') as f:
             json.dump(self.data, f)
             # self._log('Data file saved')
     
@@ -94,7 +93,7 @@ class ImageCache:
             resp = requests.get(url, stream=True)
             filename = self._make_valid_path() + '.' + url.split('.')[-1]
             self._log('Downloading \'%s\' as %s' % (url, filename))
-            with open(self.path(self._dump_path) + filename, 'wb') as f:
+            with open(self._dump_path + filename, 'wb') as f:
                 shutil.copyfileobj(resp.raw, f)
             del resp
             self.data['images'][url] = {

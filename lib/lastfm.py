@@ -6,11 +6,10 @@ import time
 import random
 
 class API:
-    def __init__(self, path,
+    def __init__(self,
             key, url='http://ws.audioscrobbler.com/2.0/',
             verbose=True, cache='lastfm.dat', cache_age=86400):
         
-        self.path = path
         self.key = key
         self.url = url
         self.verbose = verbose
@@ -24,7 +23,7 @@ class API:
             self.cache = self._default_cache
             self._save_cache()
         else:
-            with open(self.path(self.cache_path), 'r') as f:
+            with open(self.cache_path, 'r') as f:
                 try:
                     self.cache = json.load(f)
                     self._log('Cache file loaded from \'%s\'' % self.cache_path)
@@ -58,7 +57,7 @@ class API:
             print('[LastFM]', *args, **kwargs)
 
     def _save_cache(self):
-        with open(self.path(self.cache_path), 'w+') as f:
+        with open(self.cache_path, 'w+') as f:
             json.dump(self.cache, f)
     
     def _update_search_cache(self, query):
