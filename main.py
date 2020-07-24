@@ -1,4 +1,4 @@
-from lib import config, LastFM, ImageCache, Paypal, Database, Mailer, printmachine, handle_order
+from lib import config, LastFM, ImageCache, Paypal, Database, Mailer, printmachine, webhooks, handle_order
 from flask import Flask, render_template, request, send_file, make_response, abort
 import json
 import time
@@ -66,21 +66,21 @@ def api_order_process(paypal_id, order_id, size):
     total = Paypal.OrderTotal(details)
     success, data = handle_order(details, order_id, size, database=database)
 
-    # 'paypal_id': details['id'],
-    # 'internal_id': internal_id,
-    # 'order_status': details['status'],
-    # 'first_name': details['payer']['name']['given_name'],
-    # 'last_name': details['payer']['name']['surname'],
-    # 'email': details['payer']['email_address'],
-    # 'payer_id': details['payer']['payer_id'],
-    # 'total': Paypal.OrderTotal(details),
-    # 'shipping_name': shipping['name'],
-    # 'address_1': shipping['address_1'],
-    # 'address_2': shipping['address_2'],
-    # 'state': shipping['state'],
-    # 'city': shipping['city'],
-    # 'zip_code': shipping['zip_code'],
-    # 'shirt_size': size
+    # paypal_id
+    # internal_id
+    # order_status
+    # first_name
+    # last_name
+    # email
+    # payer_id
+    # total
+    # shipping_name
+    # address_1
+    # address_2
+    # state
+    # city
+    # zip_code
+    # shirt_size
 
     if success:
         email = config['emails']['confirmation']
@@ -89,6 +89,9 @@ def api_order_process(paypal_id, order_id, size):
             email['subject'], open(email['body_file'], 'r').read(),
             base_url=config['base_url'], **data
         )
+
+        embed = webhooks.build_new_order(oder_id, first_name, last_name, config['base_url'])
+        webhooks.send_webhook(config['webhook'], embed)
 
     return json.dumps({
         'success': success,

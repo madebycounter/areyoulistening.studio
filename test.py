@@ -1,4 +1,4 @@
-from lib import config, LastFM, ImageCache, Paypal, Database, Mailer, printmachine
+from lib import config, LastFM, ImageCache, Paypal, Database, Mailer, printmachine, webhooks
 
 lastfm = LastFM(config['lastfm']['api_key'], cache=config['lastfm']['cache'])
 imgcache = ImageCache(data=config['covers']['data_file'], dump=config['covers']['dump_dir'])
@@ -9,25 +9,25 @@ database = Database(host=config['database']['host'], username=config['database']
 
 
 
-data = {
-    'first_name': 'William',
-    'ship_to': '1908 crestmont drive',
-    'size': 'Medium',
-    'internal_id': '51bd67ec',
-    'base_url': 'http://75.49.248.98:8104/'
-}
+# data = {
+#     'first_name': 'William',
+#     'ship_to': '1908 crestmont drive',
+#     'size': 'Medium',
+#     'internal_id': '51bd67ec',
+#     'base_url': 'http://75.49.248.98:8104/'
+# }
 
-r = mailer.send_message(
-    'wg4568@gmail.com',
-    config['emails']['confirmation']['name'],
-    config['emails']['confirmation']['sender'],
-    config['emails']['confirmation']['subject'],
-    open(config['emails']['confirmation']['body_file'], 'r').read(),
-    **data
-)
+# r = mailer.send_message(
+#     'wg4568@gmail.com',
+#     config['emails']['confirmation']['name'],
+#     config['emails']['confirmation']['sender'],
+#     config['emails']['confirmation']['subject'],
+#     open(config['emails']['confirmation']['body_file'], 'r').read(),
+#     **data
+# )
 
-print(r)
-print(r.text)
+# embed = webhooks.build_new_order('646fff1a', 'William', 'Gardner', config['base_url'])
+# webhooks.send_webhook('', embed)
 
 # database.delete_image_data('3eada9c9')
 
