@@ -18,6 +18,15 @@ database = Database(host=config['database']['host'], username=config['database']
 
 app = Flask(__name__, template_folder=config['templates_folder'])
 
+# ERRORS
+@app.errorhandler(404)
+def error_404(e):
+    return render_template('error.html', error_code=404), 404
+
+@app.errorhandler(500)
+def error_500(e):
+    return render_template('error.html', error_code=500), 500
+
 # THE API
 @app.route('/api/search/<query>', methods=['GET'])
 def api_search(query):
