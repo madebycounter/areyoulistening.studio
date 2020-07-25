@@ -68,7 +68,7 @@ def api_design(order_id):
 def api_order_process(paypal_id, order_id, size):
     details = paypal.get_order_details(paypal_id)
     total = Paypal.OrderTotal(details)
-    success, data = handle_order(details, order_id, size, database=database)
+    success, data, contact = handle_order(details, order_id, size, database=database)
 
     # paypal_id
     # internal_id
@@ -95,6 +95,10 @@ def api_order_process(paypal_id, order_id, size):
         )
 
         embed = webhooks.build_new_order(order_id, data['first_name'], data['last_name'], config['base_url'])
+        webhooks.send_webhook(config['webhook'], embed)
+
+    if not success:
+        embed = webhooks.build_error(order_id, str(data), contact, config['base_url'])
         webhooks.send_webhook(config['webhook'], embed)
 
     return json.dumps({

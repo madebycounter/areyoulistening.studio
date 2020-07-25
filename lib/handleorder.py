@@ -2,7 +2,6 @@ from .paypal import Paypal
 
 def handle_order(details, internal_id, size, database=None, required_total=24):
     if not database: raise Exception('database parameter required')
-    if size not in ['small', 'medium', 'large', 'extralarge']: return False, 'invalid size'
     shipping = Paypal.ShippingInfo(details)
 
     order_details = {
@@ -23,9 +22,11 @@ def handle_order(details, internal_id, size, database=None, required_total=24):
         'shirt_size': size
     }
 
-    success, err = database.make_new_order(**order_details)
-    if not success: return False, err
-    if not database.image_data_exists(internal_id): return False, 'image file not generated'
-    if order_details['total'] < required_total: return False, 'insufficient funding'
+    if size not in ['small', 'medium', 'large', 'extralarge']: return False, 'invalid size', order_details['email']
 
-    return True, order_details
+    success, err = database.make_new_order(**order_details)
+    if not success: return False, err, order_details['email']
+    if not database.image_data_exists(internal_id): return False, 'image file not generated', order_details['email']
+    if order_details['total'] < required_total: return False, 'insufficient funding', order_details['email']
+
+    return True, order_details, order_details['email']
