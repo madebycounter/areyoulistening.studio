@@ -1,6 +1,7 @@
 .venv/
 __pycache__/
-res/
 cache/
 *.pyc
 test.py
+info/
+config.json

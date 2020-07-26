@@ -1,5 +1,5 @@
 from lib import LastFM, ImageCache, Paypal, Database, Mailer, printmachine, webhooks, handle_order
-from flask import Flask, render_template, request, send_file, make_response, abort
+from flask import Flask, render_template, request, send_file, make_response, abort, Response
 import json
 import time
 import random
@@ -26,6 +26,23 @@ def error_404(e):
 @app.errorhandler(500)
 def error_500(e):
     return render_template('error.html', error_code=500), 500
+
+@app.errorhandler(Exception)
+def handle_exception(e):
+    return abort(500)
+
+# ROBOTS.TXT and SITEMAP
+@app.route('/robots.txt', methods=['GET'])
+def robots_txt():
+    with open(config['robots.txt'], 'r') as f:
+        data = f.read().replace('{{ base_url }}', config['base_url'])
+    return Response(data, mimetype='text/plain')
+
+@app.route('/sitemap.xml', methods=['GET'])
+def sitemap_xml():
+    with open(config['sitemap.xml'], 'r') as f:
+        data = f.read().replace('{{ base_url }}', config['base_url'])
+    return Response(data, mimetype='text/plain')
 
 # THE API
 @app.route('/api/search/<query>', methods=['GET'])

@@ -54,6 +54,9 @@
 
     "templates_folder": "pages/",
 
+    "robots.txt": "res/robots.txt",
+    "sitemap.xml": "res/sitemap.xml",
+
     "base_url": "",
     "webhook": "",
     "order_price": 24.00
