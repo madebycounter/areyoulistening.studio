@@ -19,7 +19,8 @@ def handle_order(details, internal_id, size, database=None, required_total=24):
         'state': shipping['state'],
         'city': shipping['city'],
         'zip_code': shipping['zip_code'],
-        'shirt_size': size
+        'shirt_size': size.upper(),
+        'tracking_number': 'NOT_SHIPPED'
     }
 
     if size not in ['small', 'medium', 'large', 'extralarge']: return False, 'invalid size', order_details['email']
