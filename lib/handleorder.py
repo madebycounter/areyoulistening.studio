@@ -7,7 +7,7 @@ def handle_order(details, internal_id, size, database=None, required_total=24):
     order_details = {
         'paypal_id': details['id'],
         'internal_id': internal_id,
-        'order_status': details['status'],
+        'order_status': 'PAID' if details['status'] == 'COMPLETED' else 'ERROR',
         'first_name': details['payer']['name']['given_name'],
         'last_name': details['payer']['name']['surname'],
         'email': details['payer']['email_address'],
