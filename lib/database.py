@@ -143,6 +143,13 @@ class Database:
                 'shirt_size': results[0][15]
             }
 
+    def set_order_status(self, internal_id, status):
+        if status not in ['PAID', 'ORDERED', 'SHIPPED', 'ERROR']: raise Exception('invalid status')
+        conn, cur = self.generate_connection()
+        cur.execute('''UPDATE `orders` SET order_status=%s WHERE internal_id=%s''', (status, internal_id,))
+        conn.commit()
+        conn.close()
+        cur.close()
 
 # mydb = Database(
 #     host="areyoulistening.studio",

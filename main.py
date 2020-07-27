@@ -60,7 +60,9 @@ def api_order_create():
         cache=imgcache, album_size=config['design']['album_size'],
         design_size=config['design']['design_size'], design_gap=config['design']['design_gap'],
         album_layout=config['design']['album_layout'], background=tuple(config['design']['background']),
-        border=tuple(config['design']['border']), border_size=config['design']['border_size'])
+        border=tuple(config['design']['border']), border_size=config['design']['border_size'],
+        logo_file=config['design']['logo_file'], logo_width=config['design']['logo_width'],
+        logo_y_position=config['design']['logo_y_position'])
     database.upload_image(order_id, design, request.json)
     del design
 
@@ -126,6 +128,7 @@ def api_order_process(paypal_id, order_id, size):
     if not success:
         embed = webhooks.build_error(order_id, str(data), contact, config['base_url'])
         webhooks.send_webhook(config['webhook'], embed)
+        database.set_order_status(order_id, 'ERROR')
 
     return json.dumps({
         'success': success,
