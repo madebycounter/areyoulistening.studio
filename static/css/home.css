@@ -114,7 +114,7 @@ img.title {
 #header {
     /* background-color: orange; */
     padding-top: 20px;
-    padding-bottom: 20px;
+    padding-bottom: 0px;
     text-align: center;
 }
 
