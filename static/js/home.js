@@ -67,7 +67,7 @@ $('#query').keypress((event) => {
 var config = {
     layout: { h: 3, v: 3 },
     offset: { x: 0, y: 260 },
-    zoom_offset: -10,
+    zoom_offset: 120,
     size: 83,
     gap: 10,
 }
@@ -186,7 +186,6 @@ function enable_close_view() {
     currently_zooming = true;
 
     var shirt_top = $('#shirt').offset().top + document.body.scrollTop
-    console.log(shirt_top)
     var target_width = 1000
 
     var middle = ($(window).width() / 2) + config.offset.x
