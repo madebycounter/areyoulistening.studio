@@ -32,16 +32,16 @@ class Database:
             paypal_id=None, internal_id=None, order_status=None, first_name=None,
             last_name=None, email=None, payer_id=None, total=None, shipping_name=None,
             address_1=None, address_2=None, state=None, city=None, zip_code=None,
-            shirt_size=None, tracking_number=None):
+            shirt_size=None, tracking_number=None, notes=None):
 
         try:
             conn, cur = self.generate_connection()
-            values = '(`paypal_id`, `internal_id`, `order_status`, `create_time`, `first_name`, `last_name`, `email`, `payer_id`, `total`, `shipping_name`, `address_1`, `address_2`, `state`, `city`, `zip_code`, `shirt_size`, `tracking_number`)'
+            values = '(`paypal_id`, `internal_id`, `order_status`, `create_time`, `first_name`, `last_name`, `email`, `payer_id`, `total`, `shipping_name`, `address_1`, `address_2`, `state`, `city`, `zip_code`, `shirt_size`, `tracking_number`, `notes`)'
             query = 'INSERT INTO `orders` ' + values + ' VALUES (' + ('%s,' * 17)[:-1] + ')'
             cur.execute(query, \
                     (paypal_id, internal_id, order_status, int(time.time()), first_name, \
-                    last_name, email, payer_id, int(total * 100), shipping_name, \
-                    address_1, address_2, state, city, zip_code, shirt_size, tracking_number))
+                    last_name, email, payer_id, int(total * 100), shipping_name, address_1, \
+                    address_2, state, city, zip_code, shirt_size, tracking_number, notes))
             conn.commit()
         except Error as error:
             return False, 'database error'
