@@ -191,6 +191,7 @@ img.title {
     #help {
         position: absolute;
         bottom: 0px;
+        max-width: 55%;
     }
 
     .tooltip {
@@ -203,5 +204,5 @@ img.title {
     .tooltip span {
         background-color: black;
         color: white;
-    }    
+    }
 }
