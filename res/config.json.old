@@ -11,7 +11,10 @@
         "album_layout": [3, 3],
         "background": [0, 0, 0, 0],
         "border": [0, 0, 0],
-        "border_size": 0
+        "border_size": 0,
+        "logo_file": "static/img/title_white.png",
+        "logo_width": 395,
+        "logo_y_position": 985
     },
 
     "mockup": {
