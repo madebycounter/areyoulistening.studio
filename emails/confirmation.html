@@ -35,7 +35,7 @@
 
 <div class="content">
     <p>Hello {{ first_name }},</p>
-    <p>Thank you for your purchase! We appreciate your support. Please allow 5-10 days for the shirt to be printed and shipped. If you have any questions or inquiries you can reply to this email.
+    <p>Thank you for your purchase! We appreciate your support. Please allow 7-10 days for the shirt to be printed and shipped. If you have any questions or inquiries you can reply to this email.
         Also, If you have any pictures or videos of the shirt you'd like to share with us, message or tag us on Instagram at <a href="https://www.instagram.com/areyoulistening.studio/">@areyoulistening.studio</a> and you might be featured!
         Your invoice is attached below.</p>
     <p>Thanks again, The AYL team :^)</p>
@@ -67,6 +67,10 @@
             <tr>
                 <td><strong>Paypal Order ID</strong></td>
                 <td>{{ paypal_id }}</td>
+            </tr>
+            <tr>
+                <td><strong>Details</strong></td>
+                <td><a href="{{ base_url }}/info/{{ internal_id }}">info page</a></td>
             </tr>
         </table>
     </div>
