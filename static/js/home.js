@@ -67,7 +67,7 @@ $('#query').keypress((event) => {
 var config = {
     layout: { h: 3, v: 3 },
     offset: { x: 0, y: 260 },
-    zoom_offset: 120,
+    zoom_offset: 90,
     size: 83,
     gap: 10,
 }
