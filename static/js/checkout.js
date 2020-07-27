@@ -13,6 +13,7 @@ $('select').click((e) => {
     $('#default').remove()
     select_open = !select_open
     click_count += 1
+    close_select()
 })
 
 $('select').on('blur', (e) => {
