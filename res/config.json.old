@@ -1,7 +1,10 @@
 {
     "lastfm": {
         "api_key": "",
-        "cache": "cache/lastfm.dat"
+        "cache": "cache/lastfm.dat",
+        "use_api_for_top": false,
+        "top_albums_file": "res/top_albums.txt",
+        "cache_age": 86400
     },
 
     "design": {

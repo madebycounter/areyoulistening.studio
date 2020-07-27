@@ -8,11 +8,15 @@ import random
 class API:
     def __init__(self,
             key, url='http://ws.audioscrobbler.com/2.0/',
-            verbose=True, cache='lastfm.dat', cache_age=86400):
+            verbose=True, cache='lastfm.dat', cache_age=86400,
+            use_api_for_top=True, top_albums_file='top_albums.txt'):
         
         self.key = key
         self.url = url
         self.verbose = verbose
+
+        self.use_api_for_top = use_api_for_top
+        self.top_albums_file = top_albums_file
 
         self._default_cache = {'top': {'created': time.time(), 'data': []}, 'searches': {}}
 
@@ -107,20 +111,37 @@ class API:
         return albums
 
     def top(self, use_cache=True, save_cache=True):
-        if not use_cache or self._update_top_cache():
-            self._log('Fetching top albums')
-            resp = self._request(method='chart.gettoptracks')
-            results = resp['tracks']['track']
+        if self.use_api_for_top:
+            if not use_cache or self._update_top_cache():
+                self._log('Fetching top albums from LastFM')
+                resp = self._request(method='chart.gettoptracks')
+                results = resp['tracks']['track']
 
-            top = []
-            for i, track in enumerate(results):
-                search = self.search(track['name'] + ' ' + track['artist']['name'], save_cache=False)
-                if len(search):
-                    album = search[0]
-                    self._log('(%s/%s) Fetched %s - %s' % (i+1, len(results), album['name'], album['artist']))
-                    top.append(search[0])
-            random.shuffle(top)
-            self.cache['top'] = {'created': time.time(), 'data': top}
-            if save_cache: self._save_cache()
+                top = []
+                for i, track in enumerate(results):
+                    search = self.search(track['name'] + ' ' + track['artist']['name'], save_cache=False)
+                    if len(search):
+                        album = search[0]
+                        self._log('(%s/%s) Fetched %s - %s' % (i+1, len(results), album['name'], album['artist']))
+                        top.append(search[0])
+                random.shuffle(top)
+                self.cache['top'] = {'created': time.time(), 'data': top}
+                if save_cache: self._save_cache()
+        else:
+            with open(self.top_albums_file, 'r') as f:
+                self._log('Fetching top albums from \'%s\'' % self.top_albums_file)
+                results = f.read().split('\n\n')
+
+                top = []
+                for i, lines in enumerate(results):
+                    album, artist = lines.split('\n')
+                    search = self.search(album + ' ' + artist, save_cache=False)
+                    if len(search):
+                        album = search[0]
+                        self._log('(%s/%s) Fetched %s - %s' % (i+1, len(results), album['name'], album['artist']))
+                        top.append(search[0])
+                # random.shuffle(top)
+                self.cache['top'] = {'created': time.time(), 'data': top}
+                if save_cache: self._save_cache()
 
         return self.cache['top']['data']

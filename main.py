@@ -9,7 +9,8 @@ import os
 with open(os.environ['AYL_CONFIG'], 'r') as f:
     config = json.load(f)
 
-lastfm = LastFM(config['lastfm']['api_key'], cache=config['lastfm']['cache'])
+lastfm = LastFM(config['lastfm']['api_key'], cache=config['lastfm']['cache'], use_api_for_top=config['lastfm']['use_api_for_top'],
+                top_albums_file=config['lastfm']['top_albums_file'], cache_age=config['lastfm']['cache_age'])
 imgcache = ImageCache(data=config['covers']['data_file'], dump=config['covers']['dump_dir'])
 paypal = Paypal(config['paypal']['client_id'], config['paypal']['client_secret'], api_url=config['paypal']['api_url'])
 mailer = Mailer(config['mailgun']['api_key'], config['mailgun']['api_domain'], api_url=config['mailgun']['api_url'])
