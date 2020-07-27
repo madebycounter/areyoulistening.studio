@@ -37,7 +37,7 @@ class Database:
         try:
             conn, cur = self.generate_connection()
             values = '(`paypal_id`, `internal_id`, `order_status`, `create_time`, `first_name`, `last_name`, `email`, `payer_id`, `total`, `shipping_name`, `address_1`, `address_2`, `state`, `city`, `zip_code`, `shirt_size`, `tracking_number`, `notes`)'
-            query = 'INSERT INTO `orders` ' + values + ' VALUES (' + ('%s,' * 17)[:-1] + ')'
+            query = 'INSERT INTO `orders` ' + values + ' VALUES (' + ('%s,' * 18)[:-1] + ')'
             cur.execute(query, \
                     (paypal_id, internal_id, order_status, int(time.time()), first_name, \
                     last_name, email, payer_id, int(total * 100), shipping_name, address_1, \
