@@ -30,6 +30,7 @@ class Paypal():
 
     def get_access_token(self):
         resp = self.session.post(self.api_url + '/v1/oauth2/token', auth=(self.client_id, self.client_secret), data={'grant_type': 'client_credentials'})
+        print(resp.json())
         self.access_token = resp.json()['access_token']
         self.access_token_life = resp.json()['expires_in']
         self.access_token_created = time.time()
