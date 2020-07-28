@@ -152,7 +152,7 @@ def tos():
 
 @app.route('/checkout/<order_id>', methods=['GET'])
 def checkout(order_id):
-    return render_template('checkout.html', order_id=order_id)
+    return render_template('checkout.html', order_id=order_id, paypal_client_id=config['paypal']['client_id'])
 
 @app.route('/complete/<order_id>', methods=['GET'])
 def complete(order_id):
