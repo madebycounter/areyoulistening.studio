@@ -63,6 +63,9 @@
     "robots.txt": "res/robots.txt",
     "sitemap.xml": "res/sitemap.xml",
 
+    "contact_email": "",
+    "contact_address": "",
+
     "base_url": "",
     "webhook": "",
     "order_price": 24.00

@@ -144,7 +144,11 @@ def index():
 
 @app.route('/tos', methods=['GET'])
 def tos():
-    return render_template('tos.html')
+    return render_template('tos.html',
+        contact_email=config['contact_email'],
+        contact_address=config['contact_address'],
+        base_url=config['base_url']
+    )
 
 @app.route('/checkout/<order_id>', methods=['GET'])
 def checkout(order_id):
