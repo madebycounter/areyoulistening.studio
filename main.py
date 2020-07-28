@@ -142,6 +142,10 @@ def api_order_process(paypal_id, order_id, size):
 def index():
     return render_template('home.html')
 
+@app.route('/tos', methods=['GET'])
+def tos():
+    return render_template('tos.html')
+
 @app.route('/checkout/<order_id>', methods=['GET'])
 def checkout(order_id):
     return render_template('checkout.html', order_id=order_id)
