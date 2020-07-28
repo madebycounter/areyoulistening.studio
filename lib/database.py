@@ -36,10 +36,16 @@ class Database:
 
         try:
             conn, cur = self.generate_connection()
-            values = '(`paypal_id`, `internal_id`, `order_status`, `create_time`, `first_name`, `last_name`, `email`, `payer_id`, `total`, `shipping_name`, `address_1`, `address_2`, `state`, `city`, `zip_code`, `shirt_size`, `tracking_number`, `notes`)'
-            query = 'INSERT INTO `orders` ' + values + ' VALUES (' + ('%s,' * 18)[:-1] + ')'
+
+            query = 'SELECT COUNT(*) FROM `orders`'
+            cur.execute(query)
+            count = cur.fetchall()[0][0]
+            friendly_name = '%s%s' % (str(count).zfill(4), first_name.lower())
+
+            values = '(`paypal_id`, `internal_id`, `friendly_name`, `order_status`, `create_time`, `first_name`, `last_name`, `email`, `payer_id`, `total`, `shipping_name`, `address_1`, `address_2`, `state`, `city`, `zip_code`, `shirt_size`, `tracking_number`, `notes`)'
+            query = 'INSERT INTO `orders` ' + values + ' VALUES (' + ('%s,' * 19)[:-1] + ')'
             cur.execute(query, \
-                    (paypal_id, internal_id, order_status, int(time.time()), first_name, \
+                    (paypal_id, internal_id, friendly_name, order_status, int(time.time()), first_name, \
                     last_name, email, payer_id, int(total * 100), shipping_name, address_1, \
                     address_2, state, city, zip_code, shirt_size, tracking_number, notes))
             conn.commit()
@@ -127,20 +133,23 @@ class Database:
             return True, {
                 'paypal_id': results[0][0],
                 'internal_id': results[0][1],
-                'order_status': results[0][2],
-                'create_time': results[0][3],
-                'first_name': results[0][4],
-                'last_name': results[0][5],
-                'email': results[0][6],
-                'payer_id': results[0][7],
-                'total': results[0][8],
-                'shipping_name': results[0][9],
-                'address_1': results[0][10],
-                'address_2': results[0][11],
-                'state': results[0][12],
-                'city': results[0][13],
-                'zip_code': results[0][14],
-                'shirt_size': results[0][15]
+                'friendly_name': results[0][2], # aaa
+                'order_status': results[0][3],
+                'create_time': results[0][4],
+                'first_name': results[0][5],
+                'last_name': results[0][6],
+                'email': results[0][7],
+                'payer_id': results[0][8],
+                'total': results[0][9],
+                'shipping_name': results[0][10],
+                'address_1': results[0][11],
+                'address_2': results[0][12],
+                'state': results[0][13],
+                'city': results[0][14],
+                'zip_code': results[0][15],
+                'shirt_size': results[0][16],
+                'tracking_number': results[0][17],
+                'notes': results[0][18]
             }
 
     def set_order_status(self, internal_id, status):
