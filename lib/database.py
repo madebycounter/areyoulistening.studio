@@ -169,9 +169,10 @@ class Database:
         platform = request.user_agent.platform
         address = request.remote_addr
         url = request.path[:128]
+        user_agent = request.user_agent.string
 
-        sql = '''INSERT INTO `tracking` (`id`, `event`, `time`, `address`, `affiliate`, `url`, `browser`, `platform`, `data`) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s);'''
-        cur.execute(sql, (None, event, int(time.time()), address, affiliate, url, browser, platform, data))
+        sql = '''INSERT INTO `tracking` (`id`, `event`, `time`, `address`, `affiliate`, `url`, `browser`, `platform`, `user_agent`, `data`) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s);'''
+        cur.execute(sql, (None, event, int(time.time()), address, affiliate, url, browser, platform, user_agent, data))
         conn.commit()
         conn.close()
         cur.close()
