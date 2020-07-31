@@ -39,7 +39,7 @@ def after_request(response):
     if 'affiliate' not in session:
         session['affiliate'] = 'none'
 
-    blacklisted = ['/api/', '/a/', '/static/']
+    blacklisted = ['/api/', '/a/', '/static/', '/favicon.ico']
     allowed = True
     for bl in blacklisted:
         if request.path.startswith(bl):
