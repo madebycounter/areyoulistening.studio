@@ -160,18 +160,18 @@ class Database:
         conn.close()
         cur.close()
 
-# mydb = Database(
-#     host="areyoulistening.studio",
-#     username="ayl-prod",
-#     password="bYAPF7M4q86m4Zfr5NUMmjpZBT4EnwUt",
-#     database="areyoulistening"
-# )
+    def add_tracking_event(self, event, affiliate, request, data=None):
+        if event not in ['VISIT', 'PREVIEW', 'CHECKOUT']: raise Exception('invalid event')
+        conn, cur = self.generate_connection()
 
-# mydb.delete_image_data('68ac1e62')
+        version = request.user_agent.version and int(request.user_agent.version.split('.')[0])
+        browser = request.user_agent.browser + ' ' + str(version)
+        platform = request.user_agent.platform
+        address = request.remote_addr
+        url = request.path[:128]
 
-# s, e =mydb.make_new_order(
-#     paypal_id=random_string(8), internal_id='internal_id', order_status='order_status', first_name='first_name',
-#     last_name='last_name', email='email', payer_id='payer_id', total=27.50
-# )
-
-# print(s, e)
+        sql = '''INSERT INTO `tracking` (`id`, `event`, `time`, `address`, `affiliate`, `url`, `browser`, `platform`, `data`) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s);'''
+        cur.execute(sql, (None, event, int(time.time()), address, affiliate, url, browser, platform, data))
+        conn.commit()
+        conn.close()
+        cur.close()

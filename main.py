@@ -1,10 +1,11 @@
 from lib import LastFM, ImageCache, Paypal, Database, Mailer, printmachine, webhooks, handle_order
-from flask import Flask, render_template, request, send_file, make_response, abort, Response
+from flask import Flask, render_template, request, send_file, make_response, abort, Response, session, redirect
 import json
 import time
 import random
 import io
 import os
+import re
 
 with open(os.environ['AYL_CONFIG'], 'r') as f:
     config = json.load(f)
@@ -31,6 +32,28 @@ def error_500(e):
 @app.errorhandler(Exception)
 def handle_exception(e):
     return abort(500)
+
+# SESSION AND AFFILIATE
+@app.after_request
+def after_request(response):
+    if 'affiliate' not in session:
+        session['affiliate'] = 'none'
+
+    blacklisted = ['/api/', '/a/', '/static/']
+    allowed = True
+    for bl in blacklisted:
+        if request.path.startswith(bl):
+            allowed = False
+    
+    if allowed:
+        database.add_tracking_event('VISIT', session['affiliate'], request)
+
+    return response
+
+@app.route('/a/<affiliate>', methods=['GET'])
+def set_affiliate(affiliate):
+    session['affiliate'] = affiliate
+    return redirect('/')
 
 # ROBOTS.TXT and SITEMAP
 @app.route('/robots.txt', methods=['GET'])
@@ -67,6 +90,7 @@ def api_order_create():
     database.upload_image(order_id, design, request.json)
     del design
 
+    database.add_tracking_event('PREVIEW', session['affiliate'], request)
     return json.dumps({ 'order': order_id })
 
 @app.route('/api/order/mockup/<order_id>', methods=['GET'])
@@ -126,6 +150,8 @@ def api_order_process(paypal_id, order_id, size):
         embed = webhooks.build_new_order(order_id, data['first_name'], data['last_name'], config['base_url'])
         webhooks.send_webhook(config['webhook'], embed)
 
+        database.add_tracking_event('CHECKOUT', session['affiliate'], request)
+
     if not success:
         embed = webhooks.build_error(order_id, str(data), contact, config['base_url'])
         webhooks.send_webhook(config['webhook'], embed)
@@ -165,4 +191,5 @@ def info(order_id):
     else: return render_template('info.html', details=details)
 
 if __name__ == '__main__':
+    app.secret_key = b'Poop secret KEY!'
     app.run(host='0.0.0.0', port=8104, debug=True)
