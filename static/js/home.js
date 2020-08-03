@@ -174,11 +174,11 @@ function desktop_render() {
 // RENDER
 function enable_fullscreen_search() {
     var offset = $('#search').offset().top + $('body').scrollTop() + 1
-    $('html, body').velocity({ scrollTop: offset })
+    $('html, body').animate({ scrollTop: offset })
 }
 
 function disable_fullscreen_search() {
-    $('html, body').velocity({ scrollTop: 0 })
+    $('html, body').animate({ scrollTop: 0 })
 }
 
 var close_enabled = false;
@@ -201,8 +201,8 @@ function enable_close_view() {
     var scroll_target = top_left.y + (1 * (size + gap)) + shirt_top - ($(window).height() / 2)
 
     if (!is_desktop) {
-        $('html, body').velocity({ scrollTop: scroll_target + config.zoom_offset })
-        $('#shirt').velocity({ width: target_width }, {
+        $('html, body').animate({ scrollTop: scroll_target + config.zoom_offset })
+        $('#shirt').animate({ width: target_width }, {
             progress: update_display,
             complete: () => {
                 close_enabled = true
@@ -226,12 +226,12 @@ function disable_close_view() {
     currently_zooming = true;
 
     if (!is_desktop) {
-        $('#shirt').velocity({ width: '100%' }, {
+        $('#shirt').animate({ width: '100%' }, {
             progress: update_display,
             complete: () => { close_enabled = false; currently_zooming = false }
         })
 
-        $('html, body').velocity({ scrollTop: 0 })
+        $('html, body').animate({ scrollTop: 0 })
     } else {
         close_enabled = false
         currently_zooming = false
