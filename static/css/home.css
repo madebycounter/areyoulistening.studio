@@ -49,6 +49,24 @@ img.title {
 }
 
 /* MISC ELEMENTS */
+#insta {
+    text-decoration: none;
+    color: black;
+}
+
+#insta img {
+    height: 2.3rem;
+    margin-left: 10px;
+    padding-bottom: 0.4rem;
+    vertical-align: middle;
+}
+
+#insta span {
+    font-size: 1.5rem;
+    margin-left: 5px;
+    display: none;
+}
+
 #shirt {
     position: absolute;
     width: 100%;
@@ -192,6 +210,14 @@ img.title {
         position: absolute;
         bottom: 0px;
         max-width: 55%;
+    }
+
+    #insta {
+        position: absolute;
+    }
+
+    #insta span {
+        display: inline-block;
     }
 
     .tooltip {
