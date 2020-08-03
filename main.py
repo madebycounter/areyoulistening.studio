@@ -45,8 +45,8 @@ def after_request(response):
         if request.path.startswith(bl):
             allowed = False
     
-    # if allowed:
-    #     database.add_tracking_event('VISIT', session['affiliate'], request)
+    if allowed:
+        database.add_tracking_event('VISIT', session['affiliate'], request)
 
     return response
 
