@@ -23,11 +23,11 @@ app = Flask(__name__, template_folder=config['templates_folder'])
 # ERRORS
 @app.errorhandler(404)
 def error_404(e):
-    return render_template('error.html', error_code=404), 404
+    return render_template('error.html', error_code=404, cache_buster=config['cache_buster']), 404
 
 @app.errorhandler(500)
 def error_500(e):
-    return render_template('error.html', error_code=500), 500
+    return render_template('error.html', error_code=500, cache_buster=config['cache_buster']), 500
 
 @app.errorhandler(Exception)
 def handle_exception(e):
@@ -45,8 +45,8 @@ def after_request(response):
         if request.path.startswith(bl):
             allowed = False
     
-    if allowed:
-        database.add_tracking_event('VISIT', session['affiliate'], request)
+    # if allowed:
+    #     database.add_tracking_event('VISIT', session['affiliate'], request)
 
     return response
 
@@ -166,29 +166,34 @@ def api_order_process(paypal_id, order_id, size):
 # USER PAGES
 @app.route('/', methods=['GET'])
 def index():
-    return render_template('home.html')
+    return render_template('home.html', cache_buster=config['cache_buster'])
 
 @app.route('/tos', methods=['GET'])
 def tos():
     return render_template('tos.html',
         contact_email=config['contact_email'],
         contact_address=config['contact_address'],
-        base_url=config['base_url']
+        base_url=config['base_url'],
+        cache_buster=config['cache_buster']
     )
 
 @app.route('/checkout/<order_id>', methods=['GET'])
 def checkout(order_id):
-    return render_template('checkout.html', order_id=order_id, paypal_client_id=config['paypal']['client_id'])
+    return render_template('checkout.html',
+        order_id=order_id,
+        paypal_client_id=config['paypal']['client_id'],
+        cache_buster=config['cache_buster']
+    )
 
 @app.route('/complete/<order_id>', methods=['GET'])
 def complete(order_id):
-    return render_template('complete.html', order_id=order_id)
+    return render_template('complete.html', order_id=order_id, cache_buster=config['cache_buster'])
 
 @app.route('/info/<order_id>', methods=['GET'])
 def info(order_id):
     exists, details = database.get_order_details(order_id)
     if not exists: abort(404)
-    else: return render_template('info.html', details=details)
+    else: return render_template('info.html', details=details, cache_buster=config['cache_buster'])
 
 if __name__ == '__main__':
     app.secret_key = b'Poop secret KEY!'
