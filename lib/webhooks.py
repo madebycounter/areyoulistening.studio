@@ -12,7 +12,7 @@ def build_new_order(order_id, first_name, last_name, base_url):
     title = '#%s' % order_id
     description = '%s %s' % (first_name, last_name)
     info_url = base_url + '/info/' + order_id
-    color = 0x039c00
+    color = 0x001d85
 
     embed = DiscordEmbed(title=title, description=description, color=color)
     embed.set_image(url=image_url)
@@ -23,13 +23,13 @@ def build_error(order_id, message, contact, base_url):
     title = 'Transaction Error'
     info_url = base_url + '/info/' + order_id
     description = 'Error: `%s`\nOrder ID: `%s`\nContact: `%s`' % (message, order_id, contact)
-    color = 0x5e0000
+    color = 0x850000
 
     embed = DiscordEmbed(title=title, description=description, color=color)
     embed.set_url(url=info_url)
     return embed
 
 def build_generic_error(title, message):
-    color = 0xbf0000
+    color = 0x850000
     embed = DiscordEmbed(title=title, description=message, color=color)
     return embed
