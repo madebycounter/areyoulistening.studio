@@ -21,7 +21,7 @@ def build_new_order(order_id, first_name, last_name, base_url):
 def build_error(order_id, message, contact, base_url):
     title = 'Transaction Error'
     info_url = base_url + '/info/' + order_id
-    description = 'Error: `%s`\nOrder ID: `%s`\nContact: `%s`' % (order_id, message, contact)
+    description = 'Error: `%s`\nOrder ID: `%s`\nContact: `%s`' % (message, order_id, contact)
     color = 0x5e0000
 
     embed = DiscordEmbed(title=title, description=description, color=color)

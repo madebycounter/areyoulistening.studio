@@ -123,22 +123,6 @@ def api_order_process(paypal_id, order_id, size):
     total = Paypal.OrderTotal(details)
     success, data, contact = handle_order(details, order_id, size, database=database)
 
-    # paypal_id
-    # internal_id
-    # order_status
-    # first_name
-    # last_name
-    # email
-    # payer_id
-    # total
-    # shipping_name
-    # address_1
-    # address_2
-    # state
-    # city
-    # zip_code
-    # shirt_size
-
     if success:
         email = config['emails']['confirmation']
         mailer.send_message(
