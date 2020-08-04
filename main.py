@@ -27,11 +27,17 @@ def error_404(e):
 
 @app.errorhandler(500)
 def error_500(e):
+    embed = webhooks.build_generic_error('Server Error', 'Error: `%s`\nURL: `%s`' % ('generic error', request.path))
+    webhooks.send_webhook(config['webhook'], embed)
+    database.add_tracking_event('ERROR', 'none', request, data='generic error')
     return render_template('error.html', error_code=500), 500
 
 @app.errorhandler(Exception)
 def handle_exception(e):
-    return abort(500)
+    embed = webhooks.build_generic_error('Server Error', 'Error: `%s`\nURL: `%s`' % (str(e), request.path))
+    webhooks.send_webhook(config['webhook'], embed)
+    database.add_tracking_event('ERROR', 'none', request, data=str(e))
+    return render_template('error.html', error_code=500), 500
 
 # SESSION AND AFFILIATE
 @app.after_request
@@ -170,10 +176,11 @@ def complete(order_id):
 
 @app.route('/info/<order_id>', methods=['GET'])
 def info(order_id):
+    x = 1 / 0
     exists, details = database.get_order_details(order_id)
     if not exists: abort(404)
     else: return render_template('info.html', details=details)
 
 if __name__ == '__main__':
     app.secret_key = b'Poop secret KEY!'
-    app.run(host='0.0.0.0', port=8104, debug=True)
+    app.run(host='0.0.0.0', port=8104, debug=False)

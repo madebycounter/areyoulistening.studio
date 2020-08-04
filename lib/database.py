@@ -161,7 +161,7 @@ class Database:
         cur.close()
 
     def add_tracking_event(self, event, affiliate, request, data=None):
-        if event not in ['VISIT', 'PREVIEW', 'CHECKOUT']: raise Exception('invalid event')
+        if event not in ['VISIT', 'PREVIEW', 'CHECKOUT', 'ERROR']: raise Exception('invalid event')
         conn, cur = self.generate_connection()
 
         version = request.user_agent.version and int(request.user_agent.version.split('.')[0])

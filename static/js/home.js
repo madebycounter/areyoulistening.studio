@@ -285,6 +285,10 @@ function generate_order() {
             // $('#preview').css('background-color', 'white')
             // $('#preview_tooltip').text('Please confirm your design')
         },
+        error: (e) => {
+            close_modal('confirm_order')
+            present_modal('modal_error')
+        }
     })
 }
 
