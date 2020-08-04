@@ -278,22 +278,23 @@ function generate_order() {
         dataType: 'json',
         success: (d) => {
             order_id = d.order
-            $('#preview .spinner').addClass('hidden')
-            $('#preview_buttons').removeClass('hidden')
-            $('#preview').css('background-image', `url(/api/order/mockup/${d.order}?width=700)`)
-            $('#preview').css('background-color', 'white')
-            $('#preview_tooltip').text('Please confirm your design')
+            window.location.href = '/checkout/' + order_id
+            // $('#preview .spinner').addClass('hidden')
+            // $('#preview_buttons').removeClass('hidden')
+            // $('#preview').css('background-image', `url(/api/order/mockup/${d.order}?width=700)`)
+            // $('#preview').css('background-color', 'white')
+            // $('#preview_tooltip').text('Please confirm your design')
         },
     })
 }
 
 function reset_confirm() {
     close_modal('confirm_order')
-    $('#preview .spinner').removeClass('hidden')
-    $('#preview_buttons').addClass('hidden')
-    $('#preview').css('background-image', 'none')
-    $('#preview').css('background-color', 'rgba(0, 0, 0, 0.2)')
-    $('#preview_tooltip').text('Your design is being generated...')
+    // $('#preview .spinner').removeClass('hidden')
+    // $('#preview_buttons').addClass('hidden')
+    // $('#preview').css('background-image', 'none')
+    // $('#preview').css('background-color', 'rgba(0, 0, 0, 0.2)')
+    // $('#preview_tooltip').text('Your design is being generated...')
     order_id = null
 }
 
