@@ -78,18 +78,34 @@ function get_square(x, y) {
 
 function init_squares() {
     $('#squares').empty()
-    cover_data = []
+    var use_cookie = $.cookie('shirt-data')
+
+    try { cover_data = JSON.parse($.cookie('shirt-data')) }
+    catch (err) { use_cookie = false }
+
+    if (!use_cookie) {
+        cover_data = []
+    }
 
     for (var x = 0; x < config.layout.h; x++) {
-        cover_data.push([])
+        if (!use_cookie) cover_data.push([])
+
         for (var y = 0; y < config.layout.v; y++) {
             var elem = $(`<div class="square" xpos="${x}" ypos="${y}"></div>`)
             $('#squares').append(elem)
-            cover_data[x].push({
-                image: '',
-                title: '',
-                artist: ''
-            })
+
+            if (use_cookie) {
+                if (cover_data[x][y]['image']) {
+                    $(elem).css('background-image', `url(${cover_data[x][y]['image']})`)
+                    $(elem).css('opacity', 0.9)
+                }
+            } else {
+                cover_data[x].push({
+                    image: '',
+                    title: '',
+                    artist: ''
+                })
+            }
 
             $(elem).click((e) => {
                 if (selected_album && close_enabled) {
@@ -104,6 +120,8 @@ function init_squares() {
                         title: $(selected_album).attr('title'),
                         artist: $(selected_album).attr('artist')
                     }
+
+                    $.cookie('shirt-data', JSON.stringify(cover_data))
 
                     selected_album = null
                     disable_close_view()
@@ -127,6 +145,8 @@ function reset_squares() {
             }
         }
     }
+
+    $.cookie('shirt-data', JSON.stringify(cover_data))
 }
 
 function update_squares() {

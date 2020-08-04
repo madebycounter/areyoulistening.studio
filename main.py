@@ -194,4 +194,4 @@ def info(order_id):
 
 if __name__ == '__main__':
     app.secret_key = b'Poop secret KEY!'
-    app.run(host='0.0.0.0', port=8104, debug=False)
+    app.run(host='0.0.0.0', port=8104, debug=True)
