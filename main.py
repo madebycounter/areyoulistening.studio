@@ -1,5 +1,5 @@
 from lib import LastFM, ImageCache, Paypal, Database, Mailer, printmachine, webhooks, handle_order
-from flask import Flask, render_template, request, send_file, make_response, abort, Response, session, redirect
+from flask import Flask, render_template as render_template_raw, request, send_file, make_response, abort, Response, session, redirect
 import json
 import time
 import random
@@ -38,6 +38,9 @@ def handle_exception(e):
     webhooks.send_webhook(config['webhook'], embed)
     database.add_tracking_event('ERROR', 'none', request, data=str(e))
     return render_template('error.html', error_code=500), 500
+
+def render_template(*args, **kwargs):
+    return render_template_raw(*args, base_url=config['base_url'], **kwargs)
 
 # SESSION AND AFFILIATE
 @app.after_request
@@ -162,8 +165,7 @@ def index():
 def tos():
     return render_template('tos.html',
         contact_email=config['contact_email'],
-        contact_address=config['contact_address'],
-        base_url=config['base_url']
+        contact_address=config['contact_address']
     )
 
 @app.route('/checkout/<order_id>', methods=['GET'])
