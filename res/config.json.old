@@ -62,6 +62,8 @@
 
     "robots.txt": "res/robots.txt",
     "sitemap.xml": "res/sitemap.xml",
+    "favicon": "static/ico/favicon_new.ico",
+    "title": "are you listening?",
 
     "contact_email": "",
     "contact_address": "",

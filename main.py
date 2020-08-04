@@ -40,7 +40,12 @@ def handle_exception(e):
     return render_template('error.html', error_code=500), 500
 
 def render_template(*args, **kwargs):
-    return render_template_raw(*args, base_url=config['base_url'], **kwargs)
+    return render_template_raw(*args,
+        base_url=config['base_url'],
+        favicon=config['favicon'],
+        title=config['title'],
+        **kwargs
+    )
 
 # SESSION AND AFFILIATE
 @app.after_request
@@ -76,6 +81,10 @@ def sitemap_xml():
     with open(config['sitemap.xml'], 'r') as f:
         data = f.read().replace('{{ base_url }}', config['base_url'])
     return Response(data, mimetype='text/plain')
+
+@app.route('/favicon.ico', methods=['GET'])
+def favicon_ico():
+    return send_file(config['favicon'])
 
 # THE API
 @app.route('/api/search/<query>', methods=['GET'])
