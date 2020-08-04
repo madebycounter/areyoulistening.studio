@@ -95,9 +95,20 @@ function init_squares() {
             $('#squares').append(elem)
 
             if (use_cookie) {
-                if (cover_data[x][y]['image']) {
-                    $(elem).css('background-image', `url(${cover_data[x][y]['image']})`)
-                    $(elem).css('opacity', 0.9)
+                var h_img = cover_data[x][y].hasOwnProperty('image')
+                var h_artist = cover_data[x][y].hasOwnProperty('artist')
+                var h_title = cover_data[x][y].hasOwnProperty('title')
+                if (!(h_img && h_artist && h_title)) {
+                    cover_data[x][y] = {
+                        image: '',
+                        title: '',
+                        artist: ''
+                    }
+                } else {
+                    if (cover_data[x][y]['image']) {
+                        $(elem).css('background-image', `url(${cover_data[x][y]['image']})`)
+                        $(elem).css('opacity', 0.9)
+                    }
                 }
             } else {
                 cover_data[x].push({
