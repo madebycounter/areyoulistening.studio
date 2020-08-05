@@ -23,7 +23,7 @@ app = Flask(__name__, template_folder=config['templates_folder'])
 # ERRORS
 @app.errorhandler(404)
 def error_404(e):
-    return render_template('error.html', error_code=404, cache_buster=config['cache_buster']), 404
+    return render_template('error.html', error_code=404), 404
 
 @app.errorhandler(500)
 def error_500(e):
@@ -169,7 +169,7 @@ def api_order_process(paypal_id, order_id, size):
 # USER PAGES
 @app.route('/', methods=['GET'])
 def index():
-    return render_template('home.html', cache_buster=config['cache_buster'])
+    return render_template('home.html')
 
 @app.route('/tos', methods=['GET'])
 def tos():
@@ -182,19 +182,18 @@ def tos():
 def checkout(order_id):
     return render_template('checkout.html',
         order_id=order_id,
-        paypal_client_id=config['paypal']['client_id'],
-        cache_buster=config['cache_buster']
+        paypal_client_id=config['paypal']['client_id']
     )
 
 @app.route('/complete/<order_id>', methods=['GET'])
 def complete(order_id):
-    return render_template('complete.html', order_id=order_id, cache_buster=config['cache_buster'])
+    return render_template('complete.html', order_id=order_id)
 
 @app.route('/info/<order_id>', methods=['GET'])
 def info(order_id):
     exists, details = database.get_order_details(order_id)
     if not exists: abort(404)
-    else: return render_template('info.html', details=details, cache_buster=config['cache_buster'])
+    else: return render_template('info.html', details=details)
 
 if __name__ == '__main__':
     app.secret_key = b'Poop secret KEY!'
