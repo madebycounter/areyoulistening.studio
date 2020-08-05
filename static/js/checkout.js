@@ -7,28 +7,39 @@ $(() => {
     if ($('#mockup')[0].complete) $('#mockup').trigger('load')
 })
 
-$('#size').click(() => {
+// $('#size').click(() => {
+// })
+var open = false
+setInterval(() => {
     if (['small', 'medium', 'large', 'extralarge'].indexOf($('#size').val()) != -1) {
         allow_paypal()
     } else {
         hide_paypal()
     }
-})
+}, 100)
 
 function allow_paypal() {
-    $('#paypal_checkout').removeClass('hidden')
+    if (!open) {
+        $('#paypal_checkout').removeClass('hidden')
+    
+        // setTimeout(() => {
+        //     $('html, body').animate({ scrollTop: 200 })
+        // }, 0)
+    }
 
-    setTimeout(() => {
-        $('html, body').animate({ scrollTop: 200 })
-    }, 100)
+    var open = true
 }
 
-function hide_paypal() {
-    $('#paypal_checkout').addClass('hidden')
+function hide_paypal() {    
+    if (open) {
+        $('#paypal_checkout').addClass('hidden')
 
-    setTimeout(() => {
-        $('html, body').animate({ scrollTop: 0 })
-    }, 100)
+        // setTimeout(() => {
+        //     $('html, body').animate({ scrollTop: 0 })
+        // }, 0)
+    }
+
+    var open = false
 }
 
 paypal.Buttons({
