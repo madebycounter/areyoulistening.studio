@@ -22,8 +22,10 @@ class API:
 
         self.cache_path = cache
         self.cache_age = cache_age
+        if not os.pardir.exists(os.path.dirname(self.cache_path)):
+            self._log('Cache directory does not exist, creating')
+            os.mkdir(os.path.dirname(self.cache_path))
         if not os.path.exists(self.cache_path):
-            os.makedirs(os.path.dirname(self.cache_path))
             self._log('Cache file does not exist, creating')
             self.cache = self._default_cache
             self._save_cache()
