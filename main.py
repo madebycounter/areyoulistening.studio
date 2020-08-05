@@ -187,6 +187,7 @@ def complete(order_id):
 
 @app.route('/info/<order_id>', methods=['GET'])
 def info(order_id):
+    x = 1 / 0
     exists, details = database.get_order_details(order_id)
     if not exists: abort(404)
     else: return render_template('info.html', details=details)
