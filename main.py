@@ -27,8 +27,6 @@ def error_404(e):
 
 @app.errorhandler(500)
 def error_500(e):
-    embed = webhooks.build_generic_error('Server Error', 'Error: `%s`\nURL: `%s`' % ('generic error', request.path))
-    webhooks.send_webhook(config['webhook'], embed)
     database.add_tracking_event('ERROR', 'none', request, data='generic error')
     return render_template('error.html', error_code=500), 500
 
