@@ -26,7 +26,7 @@ img.title {
 .square {
     position: absolute;
     background-color: black;
-    background-size: contain;
+    background-size: cover;
     opacity: 0.3;
     width: 100px;
     height: 100px;
