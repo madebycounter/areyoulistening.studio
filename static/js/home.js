@@ -22,9 +22,6 @@ var selected_album, cover_data
 function update_albums(list) {
     $('#results').empty()
 
-    $('#search_loader').removeClass('hidden')
-    $('#results').addClass('hidden')
-
     var check_loaded = () => {
         if (loaded_count == list.length) {
             $('#search_loader').addClass('hidden')
@@ -32,7 +29,15 @@ function update_albums(list) {
         }
     }
 
-    var loaded_count = 0;
+    var loaded_count = 0
+
+    setTimeout(() => {
+        if (loaded_count != list.length) {
+            $('#search_loader').removeClass('hidden')
+            $('#results').addClass('hidden')    
+        }
+    }, 100)
+
     list.forEach((album) => {
         var elem = $(`<img src="${album.image}" class="album" title="${album.name}" artist="${album.artist}" image_large="${album.image_large}"></img>`)
         $(elem).on('error', () => { $(elem).remove(); loaded_count++; check_loaded() })
@@ -53,15 +58,20 @@ function update_albums(list) {
     }
 }
 
-function do_search() {
+function do_search(dont_blur) {
     var query = $('#query').val()
-    $('#query').blur()
+    if (!dont_blur) $('#query').blur()
     album_search(query, update_albums)
 }
 
-$('#query').keypress((event) => {
-    if (event.which == 13) do_search()
-});
+$('#query').keypress((e) => {
+    if (e.which == 13) do_search()
+})
+
+$('#query').on('input', (e) => {
+    console.log($('#query').val())
+    do_search(true)
+})
 
 // SQUARES
 var config = {

@@ -86,9 +86,14 @@ def favicon_ico():
     return send_file(config['favicon'])
 
 # THE API
+@app.route('/api/search/', methods=['GET'])
+def api_search_empty():
+    return json.dumps(lastfm.top())
+
 @app.route('/api/search/<query>', methods=['GET'])
 def api_search(query):
-    return json.dumps(lastfm.search(query))
+    try: return json.dumps(lastfm.search(query))
+    except RuntimeError: return json.dumps([])
 
 @app.route('/api/top', methods=['GET'])
 def api_top():
