@@ -69,6 +69,7 @@
     "contact_address": "",
 
     "base_url": "",
+    "cache_buster": "",
     "webhook": "",
     "order_price": 24.00
 }

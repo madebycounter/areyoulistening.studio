@@ -193,6 +193,7 @@ function desktop_render() {
     $('#header').css('right', (right_width - $('#header').width()) / 2)
     $('#header').css('display', 'block')
     $('#help').css('left', $('#search').width() + 20)
+    $('#insta').css('right', right_width - $('#insta').width() - 15)
 
     if (right_width - 20 < max_height) $('#design').width(right_width - 20)
     else {
