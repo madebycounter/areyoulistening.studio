@@ -353,14 +353,15 @@ $('#reset').click(() => {
 })
 
 $('#order').click(() => {
-    var all_filled = true
-    for (var x = 0; x < config.layout.h; x++) {
-        for (var y = 0; y < config.layout.v; y++) {
-            opacity = get_square(x, y).css('opacity')
-            if (opacity != 0.9) all_filled = false
-        }
-    }
+    // var all_filled = true
+    // for (var x = 0; x < config.layout.h; x++) {
+    //     for (var y = 0; y < config.layout.v; y++) {
+    //         opacity = get_square(x, y).css('opacity')
+    //         if (opacity != 0.9) all_filled = false
+    //     }
+    // }
 
-    if (!all_filled) present_modal('confirm_incomplete')
-    else generate_order()
+    // if (!all_filled) present_modal('confirm_incomplete')
+    // else generate_order()
+    generate_order()
 })
