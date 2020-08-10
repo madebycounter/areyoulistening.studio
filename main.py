@@ -10,6 +10,9 @@ import re
 with open(os.environ['AYL_CONFIG'], 'r') as f:
     config = json.load(f)
 
+with open(config['header_data'], 'r') as f:
+    header_data = f.read()
+
 lastfm = LastFM(config['lastfm']['api_key'], cache=config['lastfm']['cache'], use_api_for_top=config['lastfm']['use_api_for_top'],
                 top_albums_file=config['lastfm']['top_albums_file'], cache_age=config['lastfm']['cache_age'])
 imgcache = ImageCache(data=config['covers']['data_file'], dump=config['covers']['dump_dir'])
@@ -43,6 +46,7 @@ def render_template(*args, **kwargs):
         favicon=config['favicon'],
         title=config['title'],
         cache_buster=config['cache_buster'],
+        header_data=header_data,
         **kwargs
     )
 

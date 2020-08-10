@@ -64,6 +64,7 @@
     "sitemap.xml": "res/sitemap.xml",
     "favicon": "static/ico/favicon_new.ico",
     "title": "are you listening?",
+    "header_data": "res/header.html",
 
     "contact_email": "",
     "contact_address": "",
