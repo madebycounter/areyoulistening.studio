@@ -35,7 +35,7 @@ def error_500(e):
 
 @app.errorhandler(Exception)
 def handle_exception(e):
-    embed = webhooks.build_generic_error('Server Error', 'Error: `%s`\nURL: `%s`' % (str(e), request.path))
+    embed = webhooks.build_generic_error('Server Error', 'Error: `%s`\nIP: `%s`\nURL: `%s`' % (request.remote_addr, str(e), request.path))
     webhooks.send_webhook(config['webhook'], embed)
     database.add_tracking_event('ERROR', 'none', request, data=str(e))
     return render_template('error.html', error_code=500), 500
