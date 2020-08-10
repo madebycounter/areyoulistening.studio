@@ -36,7 +36,7 @@ def error_500(e):
 @app.errorhandler(Exception)
 def handle_exception(e):
     embed = webhooks.build_generic_error('Server Error', 'Error: `%s`\nIP: `%s`\nURL: `%s`' % (request.remote_addr, str(e), request.path))
-    webhooks.send_webhook(config['webhook'], embed)
+    webhooks.send_webhook(config['webhooks']['error'], embed)
     database.add_tracking_event('ERROR', 'none', request, data=str(e))
     return render_template('error.html', error_code=500), 500
 
@@ -158,13 +158,13 @@ def api_order_process(paypal_id, order_id, size):
         )
 
         embed = webhooks.build_new_order(order_id, data['first_name'], data['last_name'], config['base_url'])
-        webhooks.send_webhook(config['webhook'], embed)
+        webhooks.send_webhook(config['webhooks']['order'], embed)
 
         database.add_tracking_event('CHECKOUT', session['affiliate'], request)
 
     if not success:
         embed = webhooks.build_error(order_id, str(data), contact, config['base_url'])
-        webhooks.send_webhook(config['webhook'], embed)
+        webhooks.send_webhook(config['webhooks']['error'], embed)
         database.set_order_status(order_id, 'ERROR')
 
     return json.dumps({
@@ -180,6 +180,7 @@ def index():
 
 @app.route('/tos', methods=['GET'])
 def tos():
+    1 / 0
     return render_template('tos.html',
         contact_email=config['contact_email'],
         contact_address=config['contact_address']
