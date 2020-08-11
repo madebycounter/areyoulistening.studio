@@ -90,8 +90,16 @@ function init_squares() {
     $('#squares').empty()
     var use_cookie = $.cookie('shirt-data')
 
-    try { cover_data = JSON.parse($.cookie('shirt-data')) }
-    catch (err) { use_cookie = false }
+    try {
+        var raw_data = decode_flask_cookie($.cookie('shirt-data'))
+        raw_data = raw_data.replace(/(^")|("$)/g, "")
+        cover_data = JSON.parse(raw_data)
+        console.log(cover_data)
+    }
+    catch (err) {
+        console.log(err)
+        use_cookie = false
+    }
 
     if (!use_cookie) {
         cover_data = []
@@ -302,6 +310,7 @@ $('#query').on('focus click', (e) => {
 
 $(window).resize(update_display)
 $(window).on('load', () => {
+    $.cookie.raw = true
     init_squares()
     update_display()
 })

@@ -92,6 +92,7 @@ img.title {
     color: white;
     border: none;
     border-bottom: white 1px solid;
+    border-radius: 0px;
     width: calc(100% - 50px);
 }
 
@@ -122,6 +123,45 @@ img.title {
     content: "";
     display: block;
     padding-top: 100%;
+}
+
+#save_design .content {
+    height: 5rem;
+}
+
+#email {
+    font-family: 'Ubuntu Mono', monospace;
+    font-size: 1rem;
+    padding: 0.4rem;
+    width: calc(100% - 0.8rem);
+    margin-bottom: 10px;
+    margin-top: 0.8rem;
+
+    border: none;
+    border-bottom: 1px solid darkgrey;
+    border-radius: 0px;
+}
+
+#email_enter {
+    position: absolute;
+    margin: auto;
+    top: 4.6rem;
+    left: -9999px;
+    right: -9999px;
+
+    width: 8rem;
+}
+
+#email_close {
+    position: absolute;
+    z-index: 5;
+    top: 10px;
+    right: 10px;
+
+    width: 15px;
+    height: 15px;
+    background-image: url(/static/img/close.png);
+    background-size: contain;
 }
 
 /* SEGMENTS */

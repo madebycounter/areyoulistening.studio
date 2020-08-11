@@ -6,6 +6,7 @@ import random
 import io
 import os
 import re
+import base64
 
 with open(os.environ['AYL_CONFIG'], 'r') as f:
     config = json.load(f)
@@ -122,6 +123,26 @@ def api_order_create():
     database.add_tracking_event('PREVIEW', session['affiliate'], request)
     return json.dumps({ 'order': order_id })
 
+@app.route('/api/order/save', methods=['POST'])
+def api_order_save():
+    order_id = database.new_internal_id()
+    design = printmachine.create_print(request.json,
+        cache=imgcache, album_size=config['design']['album_size'],
+        design_size=config['design']['design_size'], design_gap=config['design']['design_gap'],
+        album_layout=config['design']['album_layout'], background=tuple(config['design']['background']),
+        border=tuple(config['design']['border']), border_size=config['design']['border_size'],
+        logo_file=config['design']['logo_file'], logo_width=config['design']['logo_width'],
+        logo_y_position=config['design']['logo_y_position'])
+    database.upload_image(order_id, design, request.json)
+    del design
+
+    url = config['base_url'] + '/load/%s' % order_id
+    database.add_tracking_event('SAVE', session['affiliate'], request)
+
+    # do email stuff
+
+    return json.dumps({ 'url': url, 'order': order_id })
+
 @app.route('/api/order/mockup/<order_id>', methods=['GET'])
 def api_mockup(order_id):
     width = request.args.get('width')
@@ -175,7 +196,6 @@ def api_order_process(paypal_id, order_id, size):
         'message': data
     })
 
-
 # USER PAGES
 @app.route('/', methods=['GET'])
 def index():
@@ -183,11 +203,21 @@ def index():
 
 @app.route('/tos', methods=['GET'])
 def tos():
-    1 / 0
     return render_template('tos.html',
         contact_email=config['contact_email'],
         contact_address=config['contact_address']
     )
+
+@app.route('/load/<order_id>', methods=['GET'])
+def load(order_id):
+    cover_data = database.get_image_details(order_id)
+    if not cover_data: abort(404)
+
+    print(json.dumps(cover_data))
+
+    response = make_response(redirect('/?loaded=%s' % order_id))
+    response.set_cookie('shirt-data', json.dumps(cover_data))
+    return response
 
 @app.route('/checkout/<order_id>', methods=['GET'])
 def checkout(order_id):

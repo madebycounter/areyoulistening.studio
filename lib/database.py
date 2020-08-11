@@ -91,6 +91,29 @@ class Database:
             cur.close()
         return True, 'success'
     
+    def get_image_details(self, internal_id):
+        conn, cur = self.generate_connection()
+        cur.execute('''SELECT album_00, album_01, album_02, album_10, album_11, album_12, album_20, album_21, album_22 FROM `images` WHERE internal_id=%s''', (internal_id,))
+        results = cur.fetchall()
+        conn.close()
+        cur.close()
+
+        if not len(results): return False
+        else:
+            cover_data = []
+            for x in range(3):
+                cover_data.append([])
+                for y in range(3):
+                    idx = (x * 3) + y
+                    title, artist, image = results[0][idx].split('|')
+                    cover_data[x].append({
+                        'artist': artist,
+                        'image': image,
+                        'title': title
+                    })
+        
+        return cover_data
+
     def get_image_data(self, internal_id):
         conn, cur = self.generate_connection()
         cur.execute('''SELECT image FROM `images` WHERE internal_id=%s''', (internal_id,))
@@ -161,7 +184,7 @@ class Database:
         cur.close()
 
     def add_tracking_event(self, event, affiliate, request, data=None):
-        if event not in ['VISIT', 'PREVIEW', 'CHECKOUT', 'ERROR']: raise Exception('invalid event')
+        if event not in ['VISIT', 'PREVIEW', 'CHECKOUT', 'ERROR', 'SAVE']: raise Exception('invalid event')
         conn, cur = self.generate_connection()
 
         version = request.user_agent.version and int(request.user_agent.version.split('.')[0])
