@@ -223,6 +223,11 @@ img.title {
 
     #insta img {
         height: 2.5rem;
+        margin-right: 0px;
+    }
+
+    #reset {
+        float: right;
     }
 
     .tooltip {
