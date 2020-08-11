@@ -133,6 +133,13 @@ span.clear {
     margin-top: 0px;
 }
 
+.centered {
+    position: absolute;
+    margin: auto;
+    left: -9999px;
+    right: -9999px;
+}
+
 /* @media  (min-width: 768px) { */
 @media  (min-width: 1050px) {
     .modal .content {

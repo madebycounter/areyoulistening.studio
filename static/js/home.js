@@ -313,13 +313,17 @@ $(window).on('load', () => {
     $.cookie.raw = true
     init_squares()
     update_display()
+
+    var params = new URLSearchParams(window.location.search)
+    if (params.get('loaded') == 'true') present_modal('order_loaded')
 })
 
 get_top_albums(update_albums)
 
 var order_id;
 function generate_order() {
-    present_modal('confirm_order')
+    $('#preview_tooltip').text('Your design is being generated...')
+    present_modal('order_loading')
 
     $.ajax({
         url: '/api/order/create',
@@ -330,26 +334,41 @@ function generate_order() {
         success: (d) => {
             order_id = d.order
             window.location.href = '/checkout/' + order_id
-            // $('#preview .spinner').addClass('hidden')
-            // $('#preview_buttons').removeClass('hidden')
-            // $('#preview').css('background-image', `url(/api/order/mockup/${d.order}?width=700)`)
-            // $('#preview').css('background-color', 'white')
-            // $('#preview_tooltip').text('Please confirm your design')
         },
         error: (e) => {
-            close_modal('confirm_order')
+            close_modal('order_loading')
+            present_modal('modal_error')
+        }
+    })
+}
+
+function save_order() {
+    var email = $('#email').val()
+    $('#preview_tooltip').text('Saving your design...')
+    present_modal('order_loading')
+    close_modal('save_design')
+
+    $.ajax({
+        url: '/api/order/save/' + email,
+        contentType: 'application/json',
+        method: 'POST',
+        data: JSON.stringify(cover_data),
+        dataType: 'json',
+        success: (d) => {
+            $('#saved_email').text(d.email)
+            close_modal('order_loading')
+            present_modal('design_saved')
+            console.log(d)
+        },
+        error: (e) => {
+            close_modal('order_loading')
             present_modal('modal_error')
         }
     })
 }
 
 function reset_confirm() {
-    close_modal('confirm_order')
-    // $('#preview .spinner').removeClass('hidden')
-    // $('#preview_buttons').addClass('hidden')
-    // $('#preview').css('background-image', 'none')
-    // $('#preview').css('background-color', 'rgba(0, 0, 0, 0.2)')
-    // $('#preview_tooltip').text('Your design is being generated...')
+    close_modal('order_loading')
     order_id = null
 }
 
@@ -361,16 +380,4 @@ $('#reset').click(() => {
     present_modal('confirm_reset', () => {})
 })
 
-$('#order').click(() => {
-    // var all_filled = true
-    // for (var x = 0; x < config.layout.h; x++) {
-    //     for (var y = 0; y < config.layout.v; y++) {
-    //         opacity = get_square(x, y).css('opacity')
-    //         if (opacity != 0.9) all_filled = false
-    //     }
-    // }
-
-    // if (!all_filled) present_modal('confirm_incomplete')
-    // else generate_order()
-    generate_order()
-})
+$('#order').click(generate_order)

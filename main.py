@@ -123,8 +123,8 @@ def api_order_create():
     database.add_tracking_event('PREVIEW', session['affiliate'], request)
     return json.dumps({ 'order': order_id })
 
-@app.route('/api/order/save', methods=['POST'])
-def api_order_save():
+@app.route('/api/order/save/<email>', methods=['POST'])
+def api_order_save(email):
     order_id = database.new_internal_id()
     design = printmachine.create_print(request.json,
         cache=imgcache, album_size=config['design']['album_size'],
@@ -141,7 +141,7 @@ def api_order_save():
 
     # do email stuff
 
-    return json.dumps({ 'url': url, 'order': order_id })
+    return json.dumps({ 'url': url, 'order': order_id, 'email': email })
 
 @app.route('/api/order/mockup/<order_id>', methods=['GET'])
 def api_mockup(order_id):
@@ -215,7 +215,7 @@ def load(order_id):
 
     print(json.dumps(cover_data))
 
-    response = make_response(redirect('/?loaded=%s' % order_id))
+    response = make_response(redirect('/?loaded=true'))
     response.set_cookie('shirt-data', json.dumps(cover_data))
     return response
 
