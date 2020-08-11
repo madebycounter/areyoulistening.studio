@@ -13,6 +13,9 @@ with open(os.environ['AYL_CONFIG'], 'r') as f:
 with open(config['header_data'], 'r') as f:
     header_data = f.read()
 
+if config['cache_buster'] == 'RANDOM':
+    config['cache_buster'] = random.randint(10000, 99999)
+
 lastfm = LastFM(config['lastfm']['api_key'], cache=config['lastfm']['cache'], use_api_for_top=config['lastfm']['use_api_for_top'],
                 top_albums_file=config['lastfm']['top_albums_file'], cache_age=config['lastfm']['cache_age'])
 imgcache = ImageCache(data=config['covers']['data_file'], dump=config['covers']['dump_dir'])
