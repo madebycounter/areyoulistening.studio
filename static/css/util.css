@@ -66,11 +66,19 @@ span.clear {
     box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
 }
 
-.button.action {
+.right {
     float: right;
+}
+
+.left {
+    float: left;
+}
+
+.button.action {
     font-weight: bold;
-    font-size: 1.3rem;
+    font-size: 1rem;
     padding: 0.5rem;
+    padding-top: 0.3rem;
 }
 
 .button.dialogue {
@@ -82,8 +90,13 @@ span.clear {
     border: black 1px solid;
 }
 
-
-
+.button.action .emoji {
+    position: relative;
+    top: 3px;
+    left: 5px;
+    height: 1rem;
+    margin-right: 0.2rem;
+}
 
 /* MODALS!!!! :D */
 .modal {
@@ -125,5 +138,13 @@ span.clear {
     .modal .content {
         max-width: 500px;
         font-size: 0.7rem;        
+    }
+
+    .button.action {
+        font-size: 1.3rem;
+    }
+
+    .button.action .emoji {
+        height: 1.3rem;
     }
 }
