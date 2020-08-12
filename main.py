@@ -17,11 +17,11 @@ with open(config['header_data'], 'r') as f:
 if config['cache_buster'] == 'RANDOM':
     config['cache_buster'] = random.randint(10000, 99999)
 
+mailer = Mailer(config['sendgrid']['api_key'])
 lastfm = LastFM(config['lastfm']['api_key'], cache=config['lastfm']['cache'], use_api_for_top=config['lastfm']['use_api_for_top'],
                 top_albums_file=config['lastfm']['top_albums_file'], cache_age=config['lastfm']['cache_age'])
 imgcache = ImageCache(data=config['covers']['data_file'], dump=config['covers']['dump_dir'])
 paypal = Paypal(config['paypal']['client_id'], config['paypal']['client_secret'], api_url=config['paypal']['api_url'])
-mailer = Mailer(config['mailgun']['api_key'], config['mailgun']['api_domain'], api_url=config['mailgun']['api_url'])
 database = Database(host=config['database']['host'], username=config['database']['username'],
                     password=config['database']['password'], database=config['database']['database'])
 
@@ -109,32 +109,34 @@ def api_top():
 
 @app.route('/api/order/create', methods=['POST'])
 def api_order_create():
-    order_id = database.new_internal_id()
-    design = printmachine.create_print(request.json,
-        cache=imgcache, album_size=config['design']['album_size'],
-        design_size=config['design']['design_size'], design_gap=config['design']['design_gap'],
-        album_layout=config['design']['album_layout'], background=tuple(config['design']['background']),
-        border=tuple(config['design']['border']), border_size=config['design']['border_size'],
-        logo_file=config['design']['logo_file'], logo_width=config['design']['logo_width'],
-        logo_y_position=config['design']['logo_y_position'])
-    database.upload_image(order_id, design, request.json)
-    del design
+    order_id, exists = database.new_internal_id(request.json)
+    if not exists:
+        design = printmachine.create_print(request.json,
+            cache=imgcache, album_size=config['design']['album_size'],
+            design_size=config['design']['design_size'], design_gap=config['design']['design_gap'],
+            album_layout=config['design']['album_layout'], background=tuple(config['design']['background']),
+            border=tuple(config['design']['border']), border_size=config['design']['border_size'],
+            logo_file=config['design']['logo_file'], logo_width=config['design']['logo_width'],
+            logo_y_position=config['design']['logo_y_position'])
+        database.upload_image(order_id, design, request.json)
+        del design
 
     database.add_tracking_event('PREVIEW', session['affiliate'], request)
     return json.dumps({ 'order': order_id })
 
 @app.route('/api/order/save/<email>', methods=['POST'])
 def api_order_save(email):
-    order_id = database.new_internal_id()
-    design = printmachine.create_print(request.json,
-        cache=imgcache, album_size=config['design']['album_size'],
-        design_size=config['design']['design_size'], design_gap=config['design']['design_gap'],
-        album_layout=config['design']['album_layout'], background=tuple(config['design']['background']),
-        border=tuple(config['design']['border']), border_size=config['design']['border_size'],
-        logo_file=config['design']['logo_file'], logo_width=config['design']['logo_width'],
-        logo_y_position=config['design']['logo_y_position'])
-    database.upload_image(order_id, design, request.json)
-    del design
+    order_id, exists = database.new_internal_id(request.json)
+    if not exists:
+        design = printmachine.create_print(request.json,
+            cache=imgcache, album_size=config['design']['album_size'],
+            design_size=config['design']['design_size'], design_gap=config['design']['design_gap'],
+            album_layout=config['design']['album_layout'], background=tuple(config['design']['background']),
+            border=tuple(config['design']['border']), border_size=config['design']['border_size'],
+            logo_file=config['design']['logo_file'], logo_width=config['design']['logo_width'],
+            logo_y_position=config['design']['logo_y_position'])
+        database.upload_image(order_id, design, request.json)
+        del design
 
     url = config['base_url'] + '/load/%s' % order_id
     database.add_tracking_event('SAVE', session['affiliate'], request)
@@ -175,10 +177,13 @@ def api_order_process(paypal_id, order_id, size):
 
     if success:
         email = config['emails']['confirmation']
+
         mailer.send_message(
             data['email'], email['name'], email['sender'],
             email['subject'], open(email['body_file'], 'r').read(),
-            base_url=config['base_url'], **data
+            reply_to=email['reply_to'],
+            details_url=config['base_url'] + '/info/' + data['internal_id'],
+            preview_url=config['base_url'] + '/api/order/mockup/' + data['internal_id'] + '?width=900'
         )
 
         embed = webhooks.build_new_order(order_id, data['first_name'], data['last_name'], config['base_url'])

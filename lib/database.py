@@ -56,8 +56,18 @@ class Database:
             cur.close()
         return True, 'success'
     
-    def new_internal_id(self, length=16):
+    def new_internal_id(self, albums, length=16):
         conn, cur = self.generate_connection()
+
+        album_info = []
+        for x in range(len(albums)):
+            for y in range(len(albums[0])):
+                album_info.append('%s|%s|%s' % (albums[x][y]['title'], albums[x][y]['artist'], albums[x][y]['image']))
+
+        album_concat = ''.join(album_info)
+        cur.execute('''SELECT internal_id FROM `images` WHERE concat(album_00, album_01, album_02, album_10, album_11, album_12, album_20, album_21, album_22) = %s''', (album_concat,))
+        results = cur.fetchall()
+        if len(results): return results[0][0], True
 
         results = [(1,)]
         internal_id = None
@@ -67,7 +77,7 @@ class Database:
             results = cur.fetchall()
 
         self.floated_ids.append(internal_id)
-        return internal_id
+        return internal_id, False
  
     def upload_image(self, internal_id, image, albums):
         album_info = []
