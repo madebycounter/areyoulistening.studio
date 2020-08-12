@@ -1,14 +1,11 @@
 from lib import LastFM, ImageCache, Paypal, Database, Mailer, printmachine, webhooks, handle_order
 from flask import Flask, render_template as render_template_raw, request, send_file, make_response, abort, Response, session, redirect
+import io, os, re
+import traceback
 import json
 import time
 import random
-import io
-import os
-import re
 import base64
-import traceback
-import sys
 
 with open(os.environ['AYL_CONFIG'], 'r') as f:
     config = json.load(f)
@@ -41,27 +38,9 @@ def error_500(e):
 
 @app.errorhandler(Exception)
 def handle_exception(e):
-    embed = webhooks.build_generic_error('Server Error', 'Error: `%s`\nIP: `%s`\nURL: `%s`' % (str(e), request.remote_addr, request.path))
+    embed = webhooks.build_generic_error('Server Error', '```%s```\nIP: `%s`\nURL: `%s`' % (traceback.format_exc(), request.remote_addr, request.path))
     webhooks.send_webhook(config['webhooks']['error'], embed)
     database.add_tracking_event('ERROR', 'none', request, data=str(e))
-
-    try:
-        exc_info = sys.exc_info()
-
-        # do you usefull stuff here
-        # (potentially raising an exception)
-        try:
-            raise TypeError("Again !?!")
-        except:
-            pass
-        # end of useful stuff
-
-
-    finally:
-        # Display the *original* exception
-        traceback.print_exception(*exc_info)
-        del exc_info
-
     return render_template('error.html', error_code=500), 500
 
 def render_template(*args, **kwargs):
@@ -99,6 +78,7 @@ def set_affiliate(affiliate):
 # ROBOTS.TXT and SITEMAP
 @app.route('/robots.txt', methods=['GET'])
 def robots_txt():
+    1/0
     with open(config['robots.txt'], 'r') as f:
         data = f.read().replace('{{ base_url }}', config['base_url'])
     return Response(data, mimetype='text/plain')

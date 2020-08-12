@@ -23,7 +23,8 @@ class Database:
             host=self.host,
             user=self.username,
             password=self.password,
-            database=self.database
+            database=self.database,
+            charset='utf8'
         )
 
         return conn, conn.cursor()
@@ -115,7 +116,7 @@ class Database:
                 cover_data.append([])
                 for y in range(3):
                     idx = (x * 3) + y
-                    title, artist, image = results[0][idx].decode().split('|')
+                    title, artist, image = str(results[0][idx]).split('|')
                     cover_data[x].append({
                         'artist': artist,
                         'image': image,
