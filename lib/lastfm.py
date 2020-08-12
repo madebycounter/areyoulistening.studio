@@ -134,6 +134,8 @@ class API:
             with open(self.top_albums_file, 'r') as f:
                 self._log('Fetching top albums from \'%s\'' % self.top_albums_file)
                 results = f.read().split('\n\n')
+                old_verbose = self.verbose
+                self.verbose = False
 
                 top = []
                 for i, lines in enumerate(results):
@@ -141,10 +143,8 @@ class API:
                     search = self.search(album + ' ' + artist, save_cache=False)
                     if len(search):
                         album = search[0]
-                        self._log('(%s/%s) Fetched %s - %s' % (i+1, len(results), album['name'], album['artist']))
                         top.append(search[0])
-                # random.shuffle(top)
                 self.cache['top'] = {'created': time.time(), 'data': top}
                 if save_cache: self._save_cache()
-
+                self.verbose = old_verbose
         return self.cache['top']['data']
