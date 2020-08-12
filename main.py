@@ -124,8 +124,8 @@ def api_order_create():
     database.add_tracking_event('PREVIEW', session['affiliate'], request)
     return json.dumps({ 'order': order_id })
 
-@app.route('/api/order/save/<email>', methods=['POST'])
-def api_order_save(email):
+@app.route('/api/order/save/<send_to>', methods=['POST'])
+def api_order_save(send_to):
     order_id, exists = database.new_internal_id(request.json)
     if not exists:
         design = printmachine.create_print(request.json,
@@ -141,7 +141,16 @@ def api_order_save(email):
     url = config['base_url'] + '/load/%s' % order_id
     database.add_tracking_event('SAVE', session['affiliate'], request)
 
-    # do email stuff
+    email = config['emails']['design_saved']
+
+    mailer.send_message(
+        send_to, email['name'], email['sender'],
+        email['subject'], open(email['body_file'], 'r').read(),
+        reply_to=email['reply_to'],
+        preview_url=config['base_url'] + '/api/order/mockup/' + order_id + '?width=500',
+        edit_url=config['base_url'] + '/load/' + order_id,
+        checkout_url=config['base_url'] + '/checkout/' + order_id
+    )
 
     return json.dumps({ 'url': url, 'order': order_id, 'email': email })
 
