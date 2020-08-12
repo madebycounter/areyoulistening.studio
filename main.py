@@ -227,10 +227,8 @@ def load(order_id):
     cover_data = database.get_image_details(order_id)
     if not cover_data: abort(404)
 
-    print(json.dumps(cover_data))
-
     response = make_response(redirect('/?loaded=true'))
-    response.set_cookie('shirt-data', json.dumps(cover_data))
+    response.set_cookie('shirt-data', json.dumps(cover_data).encode('utf-8'))
     return response
 
 @app.route('/checkout/<order_id>', methods=['GET'])
