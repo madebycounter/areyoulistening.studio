@@ -78,7 +78,6 @@ def set_affiliate(affiliate):
 # ROBOTS.TXT and SITEMAP
 @app.route('/robots.txt', methods=['GET'])
 def robots_txt():
-    1/0
     with open(config['robots.txt'], 'r') as f:
         data = f.read().replace('{{ base_url }}', config['base_url'])
     return Response(data, mimetype='text/plain')
