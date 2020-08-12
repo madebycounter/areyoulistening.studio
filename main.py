@@ -7,6 +7,7 @@ import io
 import os
 import re
 import base64
+import traceback
 
 with open(os.environ['AYL_CONFIG'], 'r') as f:
     config = json.load(f)
@@ -42,7 +43,24 @@ def handle_exception(e):
     embed = webhooks.build_generic_error('Server Error', 'Error: `%s`\nIP: `%s`\nURL: `%s`' % (str(e), request.remote_addr, request.path))
     webhooks.send_webhook(config['webhooks']['error'], embed)
     database.add_tracking_event('ERROR', 'none', request, data=str(e))
-    print(e)
+
+    try:
+        exc_info = sys.exc_info()
+
+        # do you usefull stuff here
+        # (potentially raising an exception)
+        try:
+            raise TypeError("Again !?!")
+        except:
+            pass
+        # end of useful stuff
+
+
+    finally:
+        # Display the *original* exception
+        traceback.print_exception(*exc_info)
+        del exc_info
+
     return render_template('error.html', error_code=500), 500
 
 def render_template(*args, **kwargs):
