@@ -115,7 +115,7 @@ class Database:
                 cover_data.append([])
                 for y in range(3):
                     idx = (x * 3) + y
-                    title, artist, image = results[0][idx].split('|')
+                    title, artist, image = results[0][idx].decode().split('|')
                     cover_data[x].append({
                         'artist': artist,
                         'image': image,
