@@ -8,6 +8,7 @@ import os
 import re
 import base64
 import traceback
+import sys
 
 with open(os.environ['AYL_CONFIG'], 'r') as f:
     config = json.load(f)
