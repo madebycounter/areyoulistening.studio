@@ -229,7 +229,7 @@ def load(order_id):
     response = make_response(redirect('/?loaded=true'))
     response.set_cookie('shirt-data', base64.b64encode(json.dumps(cover_data).encode('utf-8')))
 
-    database.add_tracking_event('LOAD', session['affiliate'], request, data=order_id):
+    database.add_tracking_event('LOAD', session['affiliate'], request, data=order_id)
     return response
 
 @app.route('/checkout/<order_id>', methods=['GET'])
