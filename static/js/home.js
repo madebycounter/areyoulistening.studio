@@ -1,3 +1,16 @@
+// COOKIES
+function load_shirt_data() {
+    $.cookie.raw = true
+    cover_data = JSON.parse(atob($.cookie('shirt-data')))
+    return cover_data
+}
+
+function save_shirt_data() {
+    $.cookie.raw = true
+    $.cookie('shirt-data', btoa(JSON.stringify(cover_data)))
+    return $.cookie('shirt-data')
+}
+
 // API
 function album_search(query, callback) {
     $.ajax({
@@ -91,10 +104,7 @@ function init_squares() {
     var use_cookie = $.cookie('shirt-data')
 
     try {
-        var raw_data = decode_flask_cookie($.cookie('shirt-data'))
-        raw_data = raw_data.replace(/(^")|("$)/g, "")
-        cover_data = JSON.parse(raw_data)
-        console.log(cover_data)
+        cover_data = load_shirt_data()
     }
     catch (err) {
         console.log(err)
@@ -150,7 +160,7 @@ function init_squares() {
                         artist: $(selected_album).attr('artist')
                     }
 
-                    $.cookie('shirt-data', JSON.stringify(cover_data))
+                    save_shirt_data()
 
                     selected_album = null
                     disable_close_view()
@@ -175,7 +185,7 @@ function reset_squares() {
         }
     }
 
-    $.cookie('shirt-data', JSON.stringify(cover_data))
+    save_shirt_data()
 }
 
 function update_squares() {
