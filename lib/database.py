@@ -154,6 +154,26 @@ class Database:
 
         return bool(results[0][0])
     
+    def find_save_affiliate(self, internal_id):
+        conn, cur = self.generate_connection()
+        query = '''
+            SELECT
+                SUBSTRING_INDEX(
+                    SUBSTRING_INDEX(data, '|', 2),
+                    '|', -1) AS order_id,
+                SUBSTRING_INDEX(data, '|', -1) AS affiliate
+            FROM tracking
+            WHERE event="SAVE"
+            HAVING order_id=%s
+        '''
+        cur.execute(query, (internal_id,))
+        results = cur.fetchall()
+
+        if not len(results):
+            return False, ''
+        else:
+            return True, results[0][1]
+
     def get_order_details(self, internal_id):
         conn, cur = self.generate_connection()
         cur.execute('''SELECT * FROM `orders` WHERE internal_id=%s''', (internal_id,))

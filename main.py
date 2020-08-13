@@ -50,15 +50,18 @@ def render_template(*args, **kwargs):
         title=config['title'],
         cache_buster=config['cache_buster'],
         header_data=header_data,
+        affiliate=session['affiliate'],
         **kwargs
     )
 
 # SESSION AND AFFILIATE
-@app.after_request
-def after_request(response):
+@app.before_request
+def before_request():
     if 'affiliate' not in session:
         session['affiliate'] = 'none'
 
+@app.after_request
+def after_request(response):
     blacklisted = ['/api/', '/a/', '/static/', '/favicon.ico']
     allowed = True
     for bl in blacklisted:
@@ -138,7 +141,7 @@ def api_order_save(send_to):
         del design
 
     url = config['base_url'] + '/load/%s' % order_id
-    database.add_tracking_event('SAVE', session['affiliate'], request, data='%s|%s' % (send_to, order_id))
+    database.add_tracking_event('SAVE', session['affiliate'], request, data='%s|%s|%s' % (send_to, order_id, session['affiliate']))
 
     email = config['emails']['design_saved']
 
@@ -226,6 +229,9 @@ def load(order_id):
     cover_data = database.get_image_details(order_id)
     if not cover_data: abort(404)
 
+    exists, affiliate = database.find_save_affiliate(order_id)
+    if exists: session['affiliate'] = affiliate
+
     response = make_response(redirect('/?loaded=true'))
     response.set_cookie('shirt-data', base64.b64encode(json.dumps(cover_data).encode('utf-8')))
 
@@ -250,5 +256,5 @@ def info(order_id):
     else: return render_template('info.html', details=details)
 
 if __name__ == '__main__':
-    app.secret_key = b'Poop secret KEY!'
+    app.secret_key = b'Poop secret KEY!!'
     app.run(host='0.0.0.0', port=8104, debug=True)
