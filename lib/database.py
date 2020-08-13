@@ -31,9 +31,9 @@ class Database:
     
     def make_new_order(self, 
             paypal_id=None, internal_id=None, order_status=None, first_name=None,
-            last_name=None, email=None, payer_id=None, total=None, shipping_name=None,
-            address_1=None, address_2=None, state=None, city=None, zip_code=None,
-            shirt_size=None, tracking_number=None, notes=None):
+            last_name=None, email=None, payer_id=None, total=None, total_received=None,
+            shipping_name=None, address_1=None, address_2=None, state=None, city=None,
+            zip_code=None, shirt_size=None, tracking_number=None, notes=None):
 
         try:
             conn, cur = self.generate_connection()
@@ -43,12 +43,12 @@ class Database:
             count = cur.fetchall()[0][0]
             friendly_name = '%s%s' % (str(count).zfill(4), first_name.lower())
 
-            values = '(`paypal_id`, `internal_id`, `friendly_name`, `order_status`, `create_time`, `first_name`, `last_name`, `email`, `payer_id`, `total`, `shipping_name`, `address_1`, `address_2`, `state`, `city`, `zip_code`, `shirt_size`, `tracking_number`, `notes`)'
+            values = '(`paypal_id`, `internal_id`, `friendly_name`, `order_status`, `create_time`, `first_name`, `last_name`, `email`, `payer_id`, `total`, `total_received`, `shipping_name`, `address_1`, `address_2`, `state`, `city`, `zip_code`, `shirt_size`, `notes`)'
             query = 'INSERT INTO `orders` ' + values + ' VALUES (' + ('%s,' * 19)[:-1] + ')'
             cur.execute(query, \
                     (paypal_id, internal_id, friendly_name, order_status, int(time.time()), first_name, \
-                    last_name, email, payer_id, int(total * 100), shipping_name, address_1, \
-                    address_2, state, city, zip_code, shirt_size, tracking_number, notes))
+                    last_name, email, payer_id, int(total * 100), int(total_received * 100), shipping_name, \
+                    address_1, address_2, state, city, zip_code, shirt_size, notes))
             conn.commit()
         except Error as error:
             return False, 'database error'
@@ -167,7 +167,7 @@ class Database:
             return True, {
                 'paypal_id': results[0][0],
                 'internal_id': results[0][1],
-                'friendly_name': results[0][2], # aaa
+                'friendly_name': results[0][2],
                 'order_status': results[0][3],
                 'create_time': results[0][4],
                 'first_name': results[0][5],
@@ -175,14 +175,14 @@ class Database:
                 'email': results[0][7],
                 'payer_id': results[0][8],
                 'total': results[0][9],
-                'shipping_name': results[0][10],
-                'address_1': results[0][11],
-                'address_2': results[0][12],
-                'state': results[0][13],
-                'city': results[0][14],
-                'zip_code': results[0][15],
-                'shirt_size': results[0][16],
-                'tracking_number': results[0][17],
+                'total_received': results[0][10],
+                'shipping_name': results[0][11],
+                'address_1': results[0][12],
+                'address_2': results[0][13],
+                'state': results[0][14],
+                'city': results[0][15],
+                'zip_code': results[0][16],
+                'shirt_size': results[0][17],
                 'notes': results[0][18]
             }
 

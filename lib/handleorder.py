@@ -3,6 +3,7 @@ from .paypal import Paypal
 def handle_order(details, internal_id, size, database=None, required_total=24):
     if not database: raise Exception('database parameter required')
     shipping = Paypal.ShippingInfo(details)
+    total, total_received = Paypal.OrderTotal(details)
 
     order_details = {
         'paypal_id': details['id'],
@@ -12,7 +13,8 @@ def handle_order(details, internal_id, size, database=None, required_total=24):
         'last_name': details['payer']['name']['surname'],
         'email': details['payer']['email_address'],
         'payer_id': details['payer']['payer_id'],
-        'total': Paypal.OrderTotal(details),
+        'total': total,
+        'total_received': total_received,
         'shipping_name': shipping['name'],
         'address_1': shipping['address_1'],
         'address_2': shipping['address_2'],
@@ -20,7 +22,6 @@ def handle_order(details, internal_id, size, database=None, required_total=24):
         'city': shipping['city'],
         'zip_code': shipping['zip_code'],
         'shirt_size': size.upper(),
-        'tracking_number': 'NOT_SHIPPED',
         'notes': ''
     }
 
