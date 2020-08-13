@@ -45,16 +45,21 @@ class Paypal():
     
     @staticmethod
     def OrderTotal(details, currency='USD'):
-        print(details)
         total = 0
         total_received = 0
+
         for pu in details['purchase_units']:
-            for capture in pu['payments']['captures']:
-                transfer = capture['seller_receivable_breakdown']                
-                if  transfer['gross_amount']['currency_code'] == currency:
-                    total += float(transfer['gross_amount']['value'])
-                    total_received += float(transfer['net_amount']['value'])
-        return total, total_received
+            if pu['amount']['currency_code'] == currency:
+                total += float(pu['amount']['value'])
+        return total, 23
+
+        # for pu in details['purchase_units']:
+        #     for capture in pu['payments']['captures']:
+        #         transfer = capture['seller_receivable_breakdown']                
+        #         if  transfer['gross_amount']['currency_code'] == currency:
+        #             total += float(transfer['gross_amount']['value'])
+        #             total_received += float(transfer['net_amount']['value'])
+        # return total, total_received
     
     @staticmethod
     def ShippingInfo(details):
