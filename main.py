@@ -138,7 +138,7 @@ def api_order_save(send_to):
         del design
 
     url = config['base_url'] + '/load/%s' % order_id
-    database.add_tracking_event('SAVE', session['affiliate'], request)
+    database.add_tracking_event('SAVE', session['affiliate'], request, data='%s|%s' % (send_to, order_id))
 
     email = config['emails']['design_saved']
 
