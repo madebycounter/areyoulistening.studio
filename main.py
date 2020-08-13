@@ -181,7 +181,7 @@ def api_design(order_id):
 def api_order_process(paypal_id, order_id, size):
     details = paypal.get_order_details(paypal_id)
     total = Paypal.OrderTotal(details)
-    success, data, contact = handle_order(details, order_id, size, database=database)
+    success, data, contact = handle_order(details, order_id, size, database=database, required_total=config['order_price'])
 
     if success:
         email = config['emails']['confirmation']
