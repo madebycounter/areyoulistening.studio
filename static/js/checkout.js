@@ -4,110 +4,124 @@ $('#mockup').on('load', () => {
 })
 
 $('select').on('change textInput input', () => {
-    update_pricing()
+    update_pricing_ui()
 })
 
 $('#promo_code').on('change textInput input', () => {
-    update_pricing(true)
+    update_pricing_ui(true)
 })
 
 $(() => {
     if ($('#mockup')[0].complete) $('#mockup').trigger('load')
 
-    update_pricing()
+    update_pricing_ui()
 })
 
-var order_price = {}
-var shipping_price = {}
-var default_order_price = {}
-var default_shipping_price = {}
-function update_pricing(allow_confetti) {
-    $.ajax({
-        method: 'GET',
-        url: '/api/order/price?item=shirt&promo=' + get_promo_code(),
-        dataType: 'json',
-        success: (d1) => {
-            if (!d1.success) reset_pricing()
+function calculate_discount(promo, price) {
+    var deduction = 0
+    if (promo['type'] == 'percent') deduction = price * promo['amount'] / 100
+    else if (promo['type'] == 'deduction') deduction = promo['amount']
 
-            order_price = {
-                base_price: d1.base_price,
-                final_price: d1.final_price,
-                discount: d1.discount    
-            }
-    
-            var country = get_shipping_type() == 'domestic' ? 'US' : 'OTHER'
+    if (deduction > price) deduction = price
+    return Math.round(deduction)
+}
 
-            $.ajax({
-                method: 'GET',
-                url: '/api/order/shipping?country=' + country + '&item=shirt&promo=' + get_promo_code(),
-                dataType: 'json',
-                success: (d2) => {
-                    if (!d2.success) return
-                    shipping_price = {
-                        price: d2.shipping_price,
-                        discount: d2.discount
-                    }
+function to_dollar_price(value) {
+    return '$' + (value / 100).toFixed(2)
+}
 
-                    if (get_promo_code() == '') {
-                        default_order_price = order_price
-                        default_shipping_price = shipping_price
-                    }
+function calculate_pricing(allow_confetti) {
+    confetti.stop()
+    var prices = {lines: [], total: null, order_total: 0}
+    var promo_code = get_promo_code()
+    var shipping_type = get_shipping_type()
+    var promo = null
 
-                    if (promo_code && allow_confetti) {
-                        confetti.start()
-                        $('#promo_code').blur()
-                        setTimeout(confetti.stop, 1000)
-                    }
+    if (promo_code in ITEM_DETAILS['promos']) {
+        promo = ITEM_DETAILS['promos'][promo_code]
+    }
 
-                    update_pricing_ui()            
-                }
+    var item_price = ITEM_DETAILS['price']
+    var shipping_price = ITEM_DETAILS['shipping'][shipping_type]
+
+    var item_discount = 0
+    var shipping_discount = 0
+
+    if (promo && promo['affects'] == 'shipping')
+        shipping_discount = calculate_discount(promo, shipping_price)
+    if (promo && promo['affects'] == 'price')
+        item_discount = calculate_discount(promo, item_price)
+
+    prices.lines.push({
+        'text': 'price',
+        'style': 'color: black',
+        'value': to_dollar_price(item_price)
+    })
+
+    if (item_discount != 0) {
+        if (promo['type'] == 'percent') {
+            prices.lines.push({
+                'text': 'discount',
+                'style': 'color: green',
+                'value': '-' + promo['amount'] + '%'
+            })
+        } else {
+            prices.lines.push({
+                'text': 'discount',
+                'style': 'color: green',
+                'value': '-' + to_dollar_price(item_discount)
             })
         }
-    })
+    }
+
+    if (shipping_price - shipping_discount == 0) {
+        prices.lines.push({
+            'text': 'shipping',
+            'style': 'color: green',
+            'value': 'Free'
+        })
+    } else {
+        if (shipping_discount != 0) {
+            prices.lines.push({
+                'text': 'shipping (discounted)',
+                'style': 'color: green',
+                'value': to_dollar_price(shipping_price - shipping_discount)
+            })
+        } else {
+            prices.lines.push({
+                'text': 'shipping',
+                'style': 'color: black',
+                'value': to_dollar_price(shipping_price)
+            })
+        }
+    }
+
+    if (allow_confetti && promo != null) {
+        $('#promo_code').blur()
+        confetti.start()
+        setTimeout(confetti.stop, 1000)
+    }
+
+    prices.total = to_dollar_price((item_price + shipping_price) - (item_discount + shipping_discount))
+    prices.order_total = item_price - item_discount
+    return prices
 }
 
-function reset_pricing() {
-    order_price = default_order_price
-    shipping_price = default_shipping_price
-
-    update_pricing_ui()
-}
-
-function update_pricing_ui() {
+function update_pricing_ui(allow_confetti) {
+    var pricing = calculate_pricing(allow_confetti)
+    
     $('#shipping_table').empty()
-
-    var base_price = (order_price.base_price / 100).toFixed(2)
-    $('#shipping_table').append(`
-        <tr>
-            <th class="dashed">price</th>
-            <td class="dashed">$${base_price}</td>
-        </tr>
-    `)
-
-    if (order_price.discount != 0) {
-        var discount = (order_price.discount / 100).toFixed(2)
+    for (var i in pricing.lines) {
+        var line = pricing.lines[i]
         $('#shipping_table').append(`
             <tr>
-                <th class="dashed">discount</th>
-                <td class="dashed" style="color: green">-$${discount}</td>
+                <th class="dashed">${line.text}</th>
+                <td class="dashed" style="${line.style}">${line.value}</td>
             </tr>
         `)
     }
 
-    var shipping_total = shipping_price.price == 0 ? 'Free' : `$${(shipping_price.price / 100).toFixed(2)}`
-    var shipping_style = shipping_price.price == 0 ? 'style="color: green"' : ''
-    if (shipping_price.price != 0 && shipping_price.discount != 0) {
-        shipping_total += ` (-$${(shipping_price.discount / 100).toFixed(2)})`
-        shipping_style = 'style="color: green"'
-    }
-    $('#shipping_table').append(`
-        <tr>
-            <th class="dashed">shipping</th>
-            <td class="dashed" ${shipping_style}>${shipping_total}</td>
-        </tr>
-    `)
-
-    $('#total').text(`$${((order_price.final_price + shipping_price.price) / 100).toFixed(2)}`)
+    $('#total').text(pricing.total)
 }
 
 function get_promo_code() {
@@ -136,7 +150,7 @@ paypal.Buttons({
             method: 'post',
             headers: { 'content-type': 'application/json' },
             body: JSON.stringify({
-                order_amount: order_amount
+                order_amount: calculate_pricing().order_total
             })
         }).then((res) => {
             return res.json()
@@ -146,6 +160,7 @@ paypal.Buttons({
     },
 
     onApprove: (data) => {
+        present_modal('modal_processing')
         return fetch('/api/order/finalize', {
             method: 'post',
             headers: { 'content-type': 'application/json' },
@@ -161,6 +176,7 @@ paypal.Buttons({
         }).then((res) => {
             return res.json()
         }).then((details) => {
+            close_modal('modal_processing')
             if (!details.success) {
                 $('#error_message').text(resp.message)
                 present_modal('modal_error')
@@ -182,11 +198,11 @@ paypal.Buttons({
                 path: '/purchase_units/@reference_id==\'default\'/amount',
                 value: {
                     currency_code: 'USD',
-                    value: ((order_amount / 100) + shipping_price).toFixed(2),
+                    value: ((calculate_pricing().order_total / 100) + shipping_price).toFixed(2),
                     breakdown: {
                         item_total: {
                             currency_code: 'USD',
-                            value: (order_amount / 100).toFixed(2)
+                            value: (calculate_pricing().order_total / 100).toFixed(2)
                         },
                         shipping: {
                             currency_code: 'USD',

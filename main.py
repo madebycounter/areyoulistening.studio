@@ -1,4 +1,4 @@
-from lib import LastFM, ImageCache, Paypal, Database, Mailer, printmachine, webhooks, handle_order, calculate_discount
+from lib import LastFM, ImageCache, Paypal, Database, Mailer, printmachine, webhooks, calculate_discount
 from flask import Flask, render_template as render_template_raw, request, send_file, make_response, abort, Response, session, redirect, json
 import io, os, re
 import traceback
@@ -394,6 +394,7 @@ def tos():
 def checkout(design_id):
     return render_template('checkout.html',
         design_id=design_id,
+        item_details=json.dumps(config['items']['shirt']),
         paypal_client_id=config['paypal']['client_id']
     )
 
