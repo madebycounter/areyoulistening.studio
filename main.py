@@ -1,8 +1,7 @@
-from lib import LastFM, ImageCache, Paypal, Database, Mailer, printmachine, webhooks, handle_order
-from flask import Flask, render_template as render_template_raw, request, send_file, make_response, abort, Response, session, redirect
+from lib import LastFM, ImageCache, Paypal, Database, Mailer, printmachine, webhooks, handle_order, calculate_discount
+from flask import Flask, render_template as render_template_raw, request, send_file, make_response, abort, Response, session, redirect, json
 import io, os, re
 import traceback
-import json
 import time
 import random
 import base64
@@ -27,6 +26,10 @@ database = Database(host=config['database']['host'], username=config['database']
 app = Flask(__name__, template_folder=config['templates_folder'])
 
 # ERRORS
+@app.errorhandler(400)
+def error_400(e):
+    return render_template('error.html', error_code=400), 400
+
 @app.errorhandler(404)
 def error_404(e):
     return render_template('error.html', error_code=404), 404
@@ -43,6 +46,20 @@ def handle_exception(e):
     database.add_tracking_event('ERROR', 'none', request, data=str(e))
     return render_template('error.html', error_code=500), 500
 
+# order_id, message, contact, base_url
+def throw_checkout_error(request, msg, order_id, paypal_id, contact):
+    database.set_order_status(order_id, 'ERROR')
+    embed = webhooks.build_order_error(msg, order_id, paypal_id, contact, config['base_url'])
+    webhooks.send_webhook(config['webhooks']['error'], embed)
+    return json.jsonify({'success': False, 'message': msg})
+
+def throw_error(request, msg, log=True):
+    if log:
+        embed = webhooks.build_caught_error(msg, request.remote_addr, request.path)
+        webhooks.send_webhook(config['webhooks']['error'], embed)
+    return json.jsonify({'success': False, 'message': msg})
+
+# render_template override
 def render_template(*args, **kwargs):
     return render_template_raw(*args,
         base_url=config['base_url'],
@@ -78,7 +95,7 @@ def set_affiliate(affiliate):
     session['affiliate'] = affiliate
     return redirect('/')
 
-# ROBOTS.TXT and SITEMAP
+# ROBOTS.TXT, SITEMAP and FAVICON
 @app.route('/robots.txt', methods=['GET'])
 def robots_txt():
     with open(config['robots.txt'], 'r') as f:
@@ -105,61 +122,60 @@ def api_search(query):
     try: return json.dumps(lastfm.search(query))
     except RuntimeError: return json.dumps([])
 
-@app.route('/api/top', methods=['GET'])
-def api_top():
-    return json.dumps(lastfm.top())
-
-@app.route('/api/order/create', methods=['POST'])
-def api_order_create():
-    order_id, exists = database.new_internal_id(request.json)
+@app.route('/api/design/create', methods=['POST'])
+def api_design_create():
+    if not request.json: return throw_error(request, 'bad request')
+    cover_data = request.json['cover_data']
+    order_id, exists = database.new_design_id(cover_data)
     if not exists:
-        design = printmachine.create_print(request.json,
+        design = printmachine.create_print(cover_data,
             cache=imgcache, album_size=config['design']['album_size'],
             design_size=config['design']['design_size'], design_gap=config['design']['design_gap'],
             album_layout=config['design']['album_layout'], background=tuple(config['design']['background']),
             border=tuple(config['design']['border']), border_size=config['design']['border_size'],
             logo_file=config['design']['logo_file'], logo_width=config['design']['logo_width'],
             logo_y_position=config['design']['logo_y_position'])
-        database.upload_image(order_id, design, request.json)
+        database.upload_image(order_id, design, cover_data)
         del design
 
     database.add_tracking_event('PREVIEW', session['affiliate'], request)
-    return json.dumps({ 'order': order_id })
+    return json.dumps({ 'order_id': order_id })
 
-@app.route('/api/order/save/<send_to>', methods=['POST'])
-def api_order_save(send_to):
-    order_id, exists = database.new_internal_id(request.json)
-    if not exists:
-        design = printmachine.create_print(request.json,
-            cache=imgcache, album_size=config['design']['album_size'],
-            design_size=config['design']['design_size'], design_gap=config['design']['design_gap'],
-            album_layout=config['design']['album_layout'], background=tuple(config['design']['background']),
-            border=tuple(config['design']['border']), border_size=config['design']['border_size'],
-            logo_file=config['design']['logo_file'], logo_width=config['design']['logo_width'],
-            logo_y_position=config['design']['logo_y_position'])
-        database.upload_image(order_id, design, request.json)
-        del design
+# SHIRT SAVING - OUT OF ACTION FOR NOW
+# @app.route('/api/order/save/<send_to>', methods=['POST'])
+# def api_order_save(send_to):
+#     order_id, exists = database.new_internal_id(request.json)
+#     if not exists:
+#         design = printmachine.create_print(request.json,
+#             cache=imgcache, album_size=config['design']['album_size'],
+#             design_size=config['design']['design_size'], design_gap=config['design']['design_gap'],
+#             album_layout=config['design']['album_layout'], background=tuple(config['design']['background']),
+#             border=tuple(config['design']['border']), border_size=config['design']['border_size'],
+#             logo_file=config['design']['logo_file'], logo_width=config['design']['logo_width'],
+#             logo_y_position=config['design']['logo_y_position'])
+#         database.upload_image(order_id, design, request.json)
+#         del design
 
-    url = config['base_url'] + '/load/%s' % order_id
-    database.add_tracking_event('SAVE', session['affiliate'], request, data='%s|%s|%s' % (send_to, order_id, session['affiliate']))
+#     url = config['base_url'] + '/load/%s' % order_id
+#     database.add_tracking_event('SAVE', session['affiliate'], request, data='%s|%s|%s' % (send_to, order_id, session['affiliate']))
 
-    email = config['emails']['design_saved']
+#     email = config['emails']['design_saved']
 
-    mailer.send_message(
-        send_to, email['name'], email['sender'],
-        email['subject'], open(email['body_file'], 'r').read(),
-        reply_to=email['reply_to'],
-        preview_url=config['base_url'] + '/api/order/mockup/' + order_id + '?width=500',
-        edit_url=config['base_url'] + '/load/' + order_id,
-        checkout_url=config['base_url'] + '/checkout/' + order_id
-    )
+#     mailer.send_message(
+#         send_to, email['name'], email['sender'],
+#         email['subject'], open(email['body_file'], 'r').read(),
+#         reply_to=email['reply_to'],
+#         preview_url=config['base_url'] + '/api/order/mockup/' + order_id + '?width=500',
+#         edit_url=config['base_url'] + '/load/' + order_id,
+#         checkout_url=config['base_url'] + '/checkout/' + order_id
+#     )
 
-    return json.dumps({ 'url': url, 'order': order_id, 'email': email })
+#     return json.dumps({ 'url': url, 'order': order_id, 'email': email })
 
-@app.route('/api/order/mockup/<order_id>', methods=['GET'])
-def api_mockup(order_id):
+@app.route('/api/design/<design_id>', methods=['GET'])
+def api_design(design_id):
     width = request.args.get('width')
-    design = database.get_image_data(order_id)
+    design = database.get_image_data(design_id)
     if not design: return abort(404)
 
     img_io = io.BytesIO()
@@ -171,46 +187,181 @@ def api_mockup(order_id):
     img_io.seek(0)
     return send_file(img_io, mimetype='image/png')
 
-@app.route('/api/order/design/<order_id>', methods=['GET'])
-def api_design(order_id):
-    image = database.get_image_data(order_id)
+@app.route('/api/design/<design_id>/raw', methods=['GET'])
+def api_design_raw(design_id):
+    width = request.args.get('width') # TODO: implement this
+    image = database.get_image_data(design_id)
     if not image: return abort(404)
 
     response = make_response(image)
     response.headers.set('Content-Type', 'image/png')
     return response
 
-@app.route('/api/order/process/<paypal_id>/<order_id>/<size>', methods=['GET'])
-def api_order_process(paypal_id, order_id, size):
-    details = paypal.get_order_details(paypal_id)
-    total = Paypal.OrderTotal(details)
-    success, data, contact = handle_order(details, order_id, size, database=database, required_total=config['order_price'])
+@app.route('/api/order/price', methods=['GET'])
+def api_order_price():
+    item_name = request.args.get('item')
+    promo_name = request.args.get('promo')
 
-    if success:
+    if not item_name: return throw_error(request, 'please specify item')
+    if item_name not in config['items']: return throw_error(request, 'no such item')
+    if promo_name and (promo_name not in config['items'][item_name]['promos']):
+        return throw_error(request, 'no such promo', log=False)
+    
+    promo = None
+    item = config['items'][item_name]
+    if promo_name: promo = item['promos'][promo_name]
+
+    discount = 0
+    base_price = item['price']
+    if promo and promo['affects'] == 'price':
+        discount = calculate_discount(promo, base_price)
+    
+    return json.jsonify({
+        'success': True,
+        'base_price': int(base_price),
+        'final_price': int(base_price - discount),
+        'discount': int(discount)
+    })
+
+@app.route('/api/order/shipping', methods=['GET'])
+def api_order_shipping():
+    country = request.args.get('country')
+    promo_name = request.args.get('promo')
+    item_name = request.args.get('item')
+
+    if not country: return throw_error(request, 'please specify country')
+    if not item_name: return throw_error(request, 'please specify item')
+    if item_name not in config['items']: return throw_error(request, 'no such item')
+    if promo_name and (promo_name not in config['items'][item_name]['promos']):
+        return throw_error(request, 'no such promo', log=False)
+
+    shipping_type = 'domestic' if country.upper() == 'US' else 'international'
+
+    promo = None
+    item = config['items'][item_name]
+    if promo_name: promo = item['promos'][promo_name]
+
+    discount = 0
+    base_price = item['shipping'][shipping_type]
+    if promo and promo['affects'] == 'shipping':
+        discount = calculate_discount(promo, base_price)
+
+    return json.jsonify({
+        'success': True,
+        'shipping_price': int(base_price - discount),
+        'discount': discount
+    })
+
+@app.route('/api/order/create', methods=['POST'])
+def api_order_create():
+    if not request.json: return throw_error(request, 'bad request')
+    if 'order_amount' not in request.json: throw_error(request, 'missing order_amount')
+
+    try: order_amount = int(request.json['order_amount'])
+    except ValueError: throw_error(request, 'order_amount must be an integer')
+    if order_amount <= 0 or order_amount > 9999: return throw_error(request, 'invalid order amount')
+
+    resp = paypal.create_order(order_amount)
+
+    return json.jsonify({
+        'success': True,
+        'order_id': resp['id']
+    })
+
+@app.route('/api/order/finalize', methods=['POST'])
+def api_order_process():
+    if not request.json: return throw_error(request, 'bad request')
+
+    try:
+        paypal_id = request.json['order_id']
+        item_name = request.json['item']
+        promo_name = request.json['promo']
+        details = request.json['details']
+    except KeyError:
+        return throw_error(request, 'missing request parameter(s)')
+
+    if item_name not in config['items']: return throw_error(request, 'no such item')
+    if promo_name and promo_name not in config['items'][item_name]['promos']:
+        return throw_error(request, 'no such promo')
+
+    promo = None
+    item = config['items'][item_name]
+    if promo_name: promo = item['promos'][promo_name]
+
+    order_id = database.new_order_id()
+    paypal.capture_payment(paypal_id) # payment is received HERE, throw CHECKOUT_ERROR for better logging (important)
+    payment_details = paypal.get_order_details(paypal_id) # pull details from paypal api (kind of redundant but idc)
+    total_price, total_shipping = paypal.PaymentBreakdown(payment_details)
+    shipping = Paypal.ShippingInfo(payment_details)
+    shipping_type = 'domestic' if shipping['country'].upper() == 'US' else 'international'
+    contact = payment_details['payer']['email_address']
+
+    expected_price = item['price']
+    expected_shipping = item['shipping'][shipping_type]
+    if promo and promo['affects'] == 'price':
+        expected_price -= calculate_discount(promo, expected_price)
+    if promo and promo['affects'] == 'shipping':
+        expected_shipping -= calculate_discount(promo, expected_shipping)
+    
+    if int(total_price) < int(expected_price):
+        return throw_checkout_error(request, 'total price too low (%s, %s)' % (total_price, promo_name), order_id, paypal_id, contact)
+    if int(total_shipping) < int(expected_shipping):
+        return throw_checkout_error(request, 'total shipping too low (%s, %s, %s)' % (total_shipping, shipping_type, promo_name), order_id, paypal_id, contact)
+
+    if item_name == 'shirt':
+        if 'design_id' not in details: return throw_checkout_error(request, 'invalid details for shirt', order_id, paypal_id, contact)
+        if 'shirt_size' not in details: return throw_checkout_error(request, 'invalid details for shirt', order_id, paypal_id, contact)
+
+        size = details['shirt_size'].upper()
+        if size not in ['SMALL', 'MEDIUM', 'LARGE', 'EXTRALARGE']: return throw_checkout_error(request, 'invalid shirt size', order_id, paypal_id, contact)
+
+        order_details = {
+            'order_id': order_id,
+            'paypal_id': payment_details['id'],
+            'design_id': details['design_id'],
+            'shirt_size': size,
+            'order_status': 'PENDING',
+            'first_name': payment_details['payer']['name']['given_name'],
+            'last_name': payment_details['payer']['name']['surname'],
+            'email': contact,
+            'total_price': total_price,
+            'total_shipping': total_shipping,
+            'promo_code': promo_name,
+            'addr_name': shipping['name'],
+            'addr_line_1': shipping['address_1'],
+            'addr_line_2': shipping['address_2'],
+            'addr_city': shipping['city'],
+            'addr_state': shipping['state'],
+            'addr_zip_code': shipping['zip_code'],
+            'addr_country': shipping['country'],
+            'notes': ''
+        }
+
+        success, err = database.make_new_order(**order_details)
+        if not success: return throw_checkout_error(request, err, order_id, paypal_id, contact)
+
         email = config['emails']['confirmation']
-
         mailer.send_message(
-            data['email'], email['name'], email['sender'],
+            order_details['email'], email['name'], email['sender'],
             email['subject'], open(email['body_file'], 'r').read(),
             reply_to=email['reply_to'],
-            details_url=config['base_url'] + '/info/' + data['internal_id'],
-            preview_url=config['base_url'] + '/api/order/mockup/' + data['internal_id'] + '?width=900'
+            details_url=config['base_url'] + '/info/' + order_id,
+            preview_url=config['base_url'] + '/api/design/' + details['design_id'] + '?width=900'
         )
 
-        embed = webhooks.build_new_order(order_id, data['first_name'], data['last_name'], config['base_url'])
+        embed = webhooks.build_new_order(order_id, details['design_id'], order_details['first_name'], order_details['last_name'], config['base_url'])
         webhooks.send_webhook(config['webhooks']['order'], embed)
 
+        if payment_details['status'] != 'COMPLETED': throw_checkout_error(request, 'paypal status not completed', order_id, paypal_id, contact)
         database.add_tracking_event('CHECKOUT', session['affiliate'], request)
+        database.set_order_status(order_id, 'PAID')
 
-    if not success:
-        embed = webhooks.build_error(order_id, str(data), contact, config['base_url'])
-        webhooks.send_webhook(config['webhooks']['error'], embed)
-        database.set_order_status(order_id, 'ERROR')
-
-    return json.dumps({
-        'success': success,
-        'message': data
-    })
+        return json.jsonify({
+            'success': success,
+            'order_id': order_id
+        })
+    
+    return throw_error('reached end of finalize with no result')
 
 # USER PAGES
 @app.route('/', methods=['GET'])
@@ -224,24 +375,25 @@ def tos():
         contact_address=config['contact_address']
     )
 
-@app.route('/load/<order_id>', methods=['GET'])
-def load(order_id):
-    cover_data = database.get_image_details(order_id)
-    if not cover_data: abort(404)
+# SAVES SYSTEM DISABLED
+# @app.route('/load/<order_id>', methods=['GET'])
+# def load(order_id):
+#     cover_data = database.get_image_details(order_id)
+#     if not cover_data: return abort(404)
 
-    exists, affiliate = database.find_save_affiliate(order_id)
-    if exists: session['affiliate'] = affiliate
+#     exists, affiliate = database.find_save_affiliate(order_id)
+#     if exists: session['affiliate'] = affiliate
 
-    response = make_response(redirect('/?loaded=true'))
-    response.set_cookie('shirt-data', base64.b64encode(json.dumps(cover_data).encode('utf-8')))
+#     response = make_response(redirect('/?loaded=true'))
+#     response.set_cookie('shirt-data', base64.b64encode(json.dumps(cover_data).encode('utf-8')))
 
-    database.add_tracking_event('LOAD', session['affiliate'], request, data=order_id)
-    return response
+#     database.add_tracking_event('LOAD', session['affiliate'], request, data=order_id)
+#     return response
 
-@app.route('/checkout/<order_id>', methods=['GET'])
-def checkout(order_id):
+@app.route('/checkout/<design_id>', methods=['GET'])
+def checkout(design_id):
     return render_template('checkout.html',
-        order_id=order_id,
+        design_id=design_id,
         paypal_client_id=config['paypal']['client_id']
     )
 
@@ -252,7 +404,7 @@ def complete(order_id):
 @app.route('/info/<order_id>', methods=['GET'])
 def info(order_id):
     exists, details = database.get_order_details(order_id)
-    if not exists: abort(404)
+    if not exists: return abort(404)
     else: return render_template('info.html', details=details)
 
 if __name__ == '__main__':

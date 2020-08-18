@@ -24,7 +24,7 @@ function album_search(query, callback) {
 function get_top_albums(callback) {
     $.ajax({
         method: 'GET',
-        url: '/api/top',
+        url: '/api/search/',
         success: callback, 
         dataType: 'json'
     })
@@ -336,13 +336,15 @@ function generate_order() {
     present_modal('order_loading')
 
     $.ajax({
-        url: '/api/order/create',
+        url: '/api/design/create',
         contentType: 'application/json',
         method: 'POST',
-        data: JSON.stringify(cover_data),
+        data: JSON.stringify({
+            cover_data: cover_data
+        }),
         dataType: 'json',
         success: (d) => {
-            order_id = d.order
+            order_id = d.order_id
             window.location.href = '/checkout/' + order_id
         },
         error: (e) => {
@@ -352,30 +354,31 @@ function generate_order() {
     })
 }
 
-function save_order() {
-    var email = $('#email').val()
-    $('#preview_tooltip').text('Saving your design...')
-    present_modal('order_loading')
-    close_modal('save_design')
+// SHIRT SAVING DISABLED
+// function save_order() {
+//     var email = $('#email').val()
+//     $('#preview_tooltip').text('Saving your design...')
+//     present_modal('order_loading')
+//     close_modal('save_design')
 
-    $.ajax({
-        url: '/api/order/save/' + email,
-        contentType: 'application/json',
-        method: 'POST',
-        data: JSON.stringify(cover_data),
-        dataType: 'json',
-        success: (d) => {
-            $('#saved_email').text(d.email)
-            close_modal('order_loading')
-            present_modal('design_saved')
-            console.log(d)
-        },
-        error: (e) => {
-            close_modal('order_loading')
-            present_modal('modal_error')
-        }
-    })
-}
+//     $.ajax({
+//         url: '/api/order/save/' + email,
+//         contentType: 'application/json',
+//         method: 'POST',
+//         data: JSON.stringify(cover_data),
+//         dataType: 'json',
+//         success: (d) => {
+//             $('#saved_email').text(d.email)
+//             close_modal('order_loading')
+//             present_modal('design_saved')
+//             console.log(d)
+//         },
+//         error: (e) => {
+//             close_modal('order_loading')
+//             present_modal('modal_error')
+//         }
+//     })
+// }
 
 function reset_confirm() {
     close_modal('order_loading')
