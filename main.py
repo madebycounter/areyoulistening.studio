@@ -71,6 +71,13 @@ def render_template(*args, **kwargs):
         **kwargs
     )
 
+# LEGACY REDIRECT
+@app.route('/api/order/mockup/<order_id>')
+def api_order_mockup(order_id):
+    width = request.args.get('width')
+    
+    return redirect('/api/design/' + order_id + '?width=' + str(width))
+
 # SESSION AND AFFILIATE
 @app.before_request
 def before_request():
