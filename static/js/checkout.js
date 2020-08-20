@@ -61,9 +61,9 @@ function calculate_pricing(allow_confetti) {
     if (item_discount != 0) {
         if (promo['type'] == 'percent') {
             prices.lines.push({
-                'text': 'discount',
+                'text': promo['amount'] + '% discount',
                 'style': 'color: green',
-                'value': '-' + promo['amount'] + '%'
+                'value': '-' + to_dollar_price(item_discount)
             })
         } else {
             prices.lines.push({
