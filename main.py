@@ -207,8 +207,8 @@ def api_design_raw(design_id):
 
 @app.route('/api/order/price', methods=['GET'])
 def api_order_price():
-    item_name = request.args.get('item')
-    promo_name = request.args.get('promo')
+    item_name = request.args.get('item').lower()
+    promo_name = request.args.get('promo').lower()
 
     if not item_name: return throw_error(request, 'please specify item')
     if item_name not in config['items']: return throw_error(request, 'no such item')
