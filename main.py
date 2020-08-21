@@ -234,8 +234,8 @@ def api_order_price():
 @app.route('/api/order/shipping', methods=['GET'])
 def api_order_shipping():
     country = request.args.get('country')
-    promo_name = request.args.get('promo')
-    item_name = request.args.get('item')
+    promo_name = request.args.get('promo').lower()
+    item_name = request.args.get('item').lower()
 
     if not country: return throw_error(request, 'please specify country')
     if not item_name: return throw_error(request, 'please specify item')
@@ -282,8 +282,8 @@ def api_order_process():
 
     try:
         paypal_id = request.json['order_id']
-        item_name = request.json['item']
-        promo_name = request.json['promo']
+        item_name = request.json['item'].lower()
+        promo_name = request.json['promo'].lower()
         details = request.json['details']
     except KeyError:
         return throw_error(request, 'missing request parameter(s)')
