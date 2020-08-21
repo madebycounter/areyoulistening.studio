@@ -207,8 +207,8 @@ def api_design_raw(design_id):
 
 @app.route('/api/order/price', methods=['GET'])
 def api_order_price():
-    item_name = request.args.get('item').lower()
-    promo_name = request.args.get('promo').lower()
+    item_name = request.args.get('item')
+    promo_name = request.args.get('promo')
 
     if not item_name: return throw_error(request, 'please specify item')
     if item_name not in config['items']: return throw_error(request, 'no such item')
@@ -234,8 +234,8 @@ def api_order_price():
 @app.route('/api/order/shipping', methods=['GET'])
 def api_order_shipping():
     country = request.args.get('country')
-    promo_name = request.args.get('promo').lower()
-    item_name = request.args.get('item').lower()
+    promo_name = request.args.get('promo')
+    item_name = request.args.get('item')
 
     if not country: return throw_error(request, 'please specify country')
     if not item_name: return throw_error(request, 'please specify item')
@@ -282,8 +282,8 @@ def api_order_process():
 
     try:
         paypal_id = request.json['order_id']
-        item_name = request.json['item'].lower()
-        promo_name = request.json['promo'].lower()
+        item_name = request.json['item']
+        promo_name = request.json['promo']
         details = request.json['details']
     except KeyError:
         return throw_error(request, 'missing request parameter(s)')

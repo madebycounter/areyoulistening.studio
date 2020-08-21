@@ -126,7 +126,7 @@ function update_pricing_ui(allow_confetti) {
 
 function get_promo_code() {
     var promo = $('#promo_code').val()
-    if (promo) return promo
+    if (promo) return promo.toLowerCase()
     else return ''
 }
 
