@@ -9,14 +9,17 @@ def create_print(design, cache=None, album_size=300,
                  logo_y_position=985):
     if not cache: raise Exception('cache argument required')
     logo = resize_image(Image.open(logo_file), width=logo_width)
+
     album_gap = int((design_gap / design_size) * album_size)
     total_size = album_size + album_gap + (2 * border_size)
     art_height = (total_size * album_layout[1]) - album_gap
+
     height = logo_y_position + logo.size[1]
     width = (total_size * album_layout[0]) - album_gap
+
     logo_x_position = int((width - logo.size[0]) / 2)
 
-    img = Image.new('RGBA', (width, height), background)
+    img = Image.new('RGBA', (width, height), tuple(background))
     img.paste(logo, (logo_x_position, logo_y_position))
     draw = ImageDraw.Draw(img)
     for x in range(album_layout[0]):
@@ -31,7 +34,7 @@ def create_print(design, cache=None, album_size=300,
                     (x * total_size) + album_size + (2 * border_size) - 1,
                     (y * total_size) + album_size + (2 * border_size) - 1
                 ]
-                draw.rectangle(bounds, fill=border)
+                draw.rectangle(bounds, fill=tuple(border))
 
                 bounds = [
                     (x * total_size) + border_size,
@@ -44,7 +47,8 @@ def create_print(design, cache=None, album_size=300,
     return img
 
 def create_mockup(design_bytes, blank_path, title_path, b_position=(916, 653), b_width=668, t_position=(1113, 1331), t_width=262):
-    design = Image.open(io.BytesIO(design_bytes)).convert('RGBA')
+    design = Image.open(io.BytesIO(design_bytes)).convert('RGB')
+
     blank = Image.open(blank_path)
     # title = Image.open(title_path)
 
