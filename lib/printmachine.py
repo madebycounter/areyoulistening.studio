@@ -47,7 +47,7 @@ def create_print(design, cache=None, album_size=300,
     return img
 
 def create_mockup(design_bytes, blank_path, title_path, b_position=(916, 653), b_width=668, t_position=(1113, 1331), t_width=262):
-    design = Image.open(io.BytesIO(design_bytes)).convert('RGB')
+    design = Image.open(io.BytesIO(design_bytes)).convert('RGBA')
 
     blank = Image.open(blank_path)
     # title = Image.open(title_path)
