@@ -60,6 +60,7 @@ function update_albums(list) {
         $(elem).on('click', (e) => {
             selected_album = elem;
             enable_close_view()
+            pause_blink()
             // disable_fullscreen_search()
         })
     })
@@ -164,12 +165,24 @@ function init_squares() {
 
                     selected_album = null
                     disable_close_view()
+
+
+
+                    if (is_complete()) start_blink()
                 } else {
                     $('#shirt').click()
                 }
             })
         }
     }
+}
+
+function is_complete() {
+    for (var x = 0; x < config.layout.h; x++)
+        for (var y = 0; y < config.layout.v; y++)
+            if (!cover_data[x][y].image)
+                return false
+    return true
 }
 
 function reset_squares() {
@@ -184,7 +197,8 @@ function reset_squares() {
             }
         }
     }
-
+    
+    stop_blink()
     save_shirt_data()
 }
 
@@ -316,17 +330,10 @@ $('#shirt').on('click', (e) => {
 $('#query').on('focus click', (e) => {
     e.preventDefault()
     enable_fullscreen_search()
+    pause_blink()
 })
 
 $(window).resize(update_display)
-$(window).on('load', () => {
-    $.cookie.raw = true
-    init_squares()
-    update_display()
-
-    var params = new URLSearchParams(window.location.search)
-    if (params.get('loaded') == 'true') present_modal('order_loaded')
-})
 
 get_top_albums(update_albums)
 
@@ -352,6 +359,30 @@ function generate_order() {
             present_modal('modal_error')
         }
     })
+}
+
+// fart blink
+var blink_interval_id
+function start_blink() {
+    stop_blink()
+    var rate = 1000
+    blink_interval_id = setInterval(() => {
+        $('#order').css('background-color', 'lightgreen')
+        setTimeout(() => {
+            $('#order').css('background-color', '')                
+        }, rate * 0.5)
+    }, rate * 2)
+}
+
+function stop_blink() {
+    clearTimeout(blink_interval_id)
+    blink_interval_id = null
+}
+
+function pause_blink() {
+    var delay = 5000
+    stop_blink()
+    setTimeout(start_blink, 5000)
 }
 
 // SHIRT SAVING DISABLED
@@ -393,4 +424,18 @@ $('#reset').click(() => {
     present_modal('confirm_reset', () => {})
 })
 
-$('#order').click(generate_order)
+$('#order').click(() => {
+    stop_blink()
+    generate_order()
+})
+
+$(window).on('load', () => {
+    $.cookie.raw = true
+    init_squares()
+    update_display()
+
+    var params = new URLSearchParams(window.location.search)
+    if (params.get('loaded') == 'true') present_modal('order_loaded')
+
+    if (is_complete()) start_blink()
+})
