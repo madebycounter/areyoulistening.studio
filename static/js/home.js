@@ -364,7 +364,7 @@ function generate_order() {
 // fart blink
 var blink_interval_id
 function start_blink() {
-    stop_blink()
+    if (blink_interval_id) return
     var rate = 1000
     blink_interval_id = setInterval(() => {
         $('#order').css('background-color', 'lightgreen')
