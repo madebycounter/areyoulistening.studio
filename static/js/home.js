@@ -380,6 +380,8 @@ function stop_blink() {
 }
 
 function pause_blink() {
+    if (!blink_interval_id) return
+
     var delay = 5000
     stop_blink()
     setTimeout(start_blink, 5000)
@@ -437,5 +439,8 @@ $(window).on('load', () => {
     var params = new URLSearchParams(window.location.search)
     if (params.get('loaded') == 'true') present_modal('order_loaded')
 
-    if (is_complete()) start_blink()
+    if (is_complete()) {
+        console.log('fart')
+        start_blink()
+    }
 })
