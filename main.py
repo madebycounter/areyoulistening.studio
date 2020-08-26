@@ -361,7 +361,7 @@ def api_order_process():
         webhooks.send_webhook(config['webhooks']['order'], embed)
 
         if payment_details['status'] != 'COMPLETED': throw_checkout_error(request, 'paypal status not completed', order_id, paypal_id, contact)
-        database.add_tracking_event('CHECKOUT', session['affiliate'], request)
+        database.add_tracking_event('CHECKOUT', session['affiliate'], request, data=order_id)
         database.set_order_status(order_id, 'PAID')
 
         return json.jsonify({
