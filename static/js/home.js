@@ -30,6 +30,31 @@ function get_top_albums(callback) {
     })
 }
 
+// shirt swappa
+function swap_covers(pos1, pos2) {
+    var old_cover = cover_data[pos2.x][pos2.y]
+    cover_data[pos2.x][pos2.y] = cover_data[pos1.x][pos1.y]
+    cover_data[pos1.x][pos1.y] = old_cover
+
+    if (cover_data[pos1.x][pos1.y].image) {
+        get_square(pos1.x, pos1.y).css('background-image', `url(${cover_data[pos1.x][pos1.y]['image']})`)
+        get_square(pos1.x, pos1.y).css('opacity', 0.9)
+    } else {
+        get_square(pos1.x, pos1.y).css('background-image', 'none')
+        get_square(pos1.x, pos1.y).css('opacity', 0.3)
+    }
+
+    if (cover_data[pos2.x][pos2.y].image) {
+        get_square(pos2.x, pos2.y).css('background-image', `url(${cover_data[pos2.x][pos2.y]['image']})`)
+        get_square(pos2.x, pos2.y).css('opacity', 0.9)
+    } else {
+        get_square(pos2.x, pos2.y).css('background-image', 'none')
+        get_square(pos2.x, pos2.y).css('opacity', 0.3)
+    }
+
+    save_shirt_data()
+}
+
 // DYNAMIC
 var selected_album, cover_data
 function update_albums(list) {
@@ -58,7 +83,8 @@ function update_albums(list) {
         $('#results').append(elem)
 
         $(elem).on('click', (e) => {
-            selected_album = elem;
+            selected_cover = null
+            selected_album = elem
             enable_close_view()
             pause_blink()
             // disable_fullscreen_search()
@@ -100,6 +126,7 @@ function get_square(x, y) {
     return $(`[xpos=${x}][ypos=${y}]`)
 }
 
+var selected_cover = null
 function init_squares() {
     $('#squares').empty()
     var use_cookie = $.cookie('shirt-data')
@@ -148,13 +175,13 @@ function init_squares() {
             }
 
             $(elem).click((e) => {
+                var url = $(selected_album).attr('src')
+                var x = $(e.target).attr('xpos')
+                var y = $(e.target).attr('ypos')
                 if (selected_album && close_enabled) {
-                    var url = $(selected_album).attr('src')
                     $(e.target).css('background-image', `url(${url})`)
                     $(e.target).css('opacity', 0.9)
 
-                    var x = $(e.target).attr('xpos')
-                    var y = $(e.target).attr('ypos')
                     cover_data[x][y] = {
                         image: $(selected_album).attr('image_large'),
                         title: $(selected_album).attr('title'),
@@ -166,11 +193,13 @@ function init_squares() {
                     selected_album = null
                     disable_close_view()
 
-
-
                     if (is_complete()) start_blink()
-                } else {
-                    $('#shirt').click()
+                } else if (!selected_cover) {
+                    selected_cover = {x: x, y: y}
+                    pause_blink()
+                } else if (selected_cover) {
+                    swap_covers(selected_cover, {x: x, y: y})
+                    selected_cover = null
                 }
             })
         }
