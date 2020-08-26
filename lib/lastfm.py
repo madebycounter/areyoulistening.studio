@@ -144,6 +144,7 @@ class API:
                     if len(search):
                         album = search[0]
                         top.append(search[0])
+                random.shuffle(top)
                 self.cache['top'] = {'created': time.time(), 'data': top}
                 if save_cache: self._save_cache()
                 self.verbose = old_verbose
