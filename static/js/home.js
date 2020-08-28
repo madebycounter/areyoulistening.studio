@@ -195,10 +195,16 @@ function init_squares() {
 
                     if (is_complete()) start_blink()
                 } else if (!selected_cover) {
-                    selected_cover = {x: x, y: y}
-                    pause_blink()
+                    if (cover_data[x][y].image) {
+                        $('#selected').text(`${cover_data[x][y].title} - ${cover_data[x][y].artist}`)
+                        $('#tooltiptext').text('tap square to swap album')
+                        $('#help').removeClass('hidden')
+                        selected_cover = {x: x, y: y}
+                        pause_blink()
+                    }
                 } else if (selected_cover) {
                     swap_covers(selected_cover, {x: x, y: y})
+                    $('#help').addClass('hidden')
                     selected_cover = null
                 }
             })
@@ -320,6 +326,7 @@ function enable_close_view() {
         var title = $(selected_album).attr('title')
         var artist = $(selected_album).attr('artist')
         $('#selected').text(`${title} - ${artist}`)
+        $('#tooltiptext').text('tap square to add album')
         $('#help').removeClass('hidden')
     }
 }
@@ -339,6 +346,7 @@ function disable_close_view() {
         currently_zooming = false
     }
 
+    selected_album = null
     $('#help').addClass('hidden')
 }
 
