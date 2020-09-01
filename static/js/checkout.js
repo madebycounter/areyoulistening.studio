@@ -13,6 +13,8 @@ $('#promo_code').on('change textInput input', () => {
 
 $(() => {
     if ($('#mockup')[0].complete) $('#mockup').trigger('load')
+    var params = new URLSearchParams(window.location.search)
+    $('#promo_code').val(params.get('promo'))
 
     update_pricing_ui()
 })

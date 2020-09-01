@@ -389,7 +389,9 @@ function generate_order() {
         dataType: 'json',
         success: (d) => {
             order_id = d.order_id
-            window.location.href = '/checkout/' + order_id
+            var end = ''
+            if (global_promo) end = '?promo=' + global_promo
+            window.location.href = '/checkout/' + order_id + end
         },
         error: (e) => {
             close_modal('order_loading')
@@ -456,7 +458,10 @@ function reset_confirm() {
 }
 
 function checkout() {
-    window.location.href = '/checkout/' + order_id
+    var end = ''
+    if (global_promo) end = '?promo=' + global_promo
+    console.log(global_promo, end)
+    window.location.href = '/checkout/' + order_id + end
 }
 
 $('#reset').click(() => {
@@ -468,6 +473,7 @@ $('#order').click(() => {
     generate_order()
 })
 
+var global_promo = ''
 $(window).on('load', () => {
     $.cookie.raw = true
     init_squares()
@@ -475,6 +481,11 @@ $(window).on('load', () => {
 
     var params = new URLSearchParams(window.location.search)
     if (params.get('loaded') == 'true') present_modal('order_loaded')
+    if (params.get('promo')) {
+        global_promo = params.get('promo')
+        $('#promo_applied_text').text(params.get('promo'))
+        present_modal('promo_applied')
+    }
 
     if (is_complete()) {
         console.log('fart')
