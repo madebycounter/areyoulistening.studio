@@ -479,6 +479,15 @@ $(window).on('load', () => {
     init_squares()
     update_display()
 
+    if (!$.cookie('modal_shown')) {
+        var date = new Date()
+        var minutes = 5
+        date.setTime(date.getTime() + (minutes * 60 * 1000))
+
+        present_modal('ayl_closed')
+        $.cookie('modal_shown', 'TRUE', { expires: date })
+    }
+
     var params = new URLSearchParams(window.location.search)
     if (params.get('loaded') == 'true') present_modal('order_loaded')
     if (params.get('promo')) {
