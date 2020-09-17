@@ -48,6 +48,10 @@ img.title {
     /* font-family: 'Ubuntu Mono', monospace; */
 }
 
+.mono {
+    font-family: 'Ubuntu Mono', monospace !important;
+}
+
 /* MISC ELEMENTS */
 #insta {
     text-decoration: none;

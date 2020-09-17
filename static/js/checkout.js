@@ -140,79 +140,79 @@ function get_shipping_type() {
     return $('#shipping').val()
 }
 
-paypal.Buttons({
-    style: {
-        height: 45,
-        color: 'black',
-        fundingicons: 'true'
-    },
+// paypal.Buttons({
+//     style: {
+//         height: 45,
+//         color: 'black',
+//         fundingicons: 'true'
+//     },
 
-    createOrder: () => {
-        return fetch('/api/order/create', {
-            method: 'post',
-            headers: { 'content-type': 'application/json' },
-            body: JSON.stringify({
-                order_amount: calculate_pricing().order_total
-            })
-        }).then((res) => {
-            return res.json()
-        }).then((details) => {
-            return details.order_id
-        })
-    },
+//     createOrder: () => {
+//         return fetch('/api/order/create', {
+//             method: 'post',
+//             headers: { 'content-type': 'application/json' },
+//             body: JSON.stringify({
+//                 order_amount: calculate_pricing().order_total
+//             })
+//         }).then((res) => {
+//             return res.json()
+//         }).then((details) => {
+//             return details.order_id
+//         })
+//     },
 
-    onApprove: (data) => {
-        present_modal('modal_processing')
-        return fetch('/api/order/finalize', {
-            method: 'post',
-            headers: { 'content-type': 'application/json' },
-            body: JSON.stringify({
-                order_id: data.orderID,
-                item: 'shirt',
-                promo: get_promo_code(),
-                details: {
-                    shirt_size: get_shirt_size(),
-                    design_id: DESIGN_ID
-                }
-            })
-        }).then((res) => {
-            return res.json()
-        }).then((details) => {
-            close_modal('modal_processing')
-            if (!details.success) {
-                $('#error_message').text(resp.message)
-                present_modal('modal_error')
-            } else {
-                window.location.href = '/complete/' + details.order_id
-            }
-        })
-    },
+//     onApprove: (data) => {
+//         present_modal('modal_processing')
+//         return fetch('/api/order/finalize', {
+//             method: 'post',
+//             headers: { 'content-type': 'application/json' },
+//             body: JSON.stringify({
+//                 order_id: data.orderID,
+//                 item: 'shirt',
+//                 promo: get_promo_code(),
+//                 details: {
+//                     shirt_size: get_shirt_size(),
+//                     design_id: DESIGN_ID
+//                 }
+//             })
+//         }).then((res) => {
+//             return res.json()
+//         }).then((details) => {
+//             close_modal('modal_processing')
+//             if (!details.success) {
+//                 $('#error_message').text(resp.message)
+//                 present_modal('modal_error')
+//             } else {
+//                 window.location.href = '/complete/' + details.order_id
+//             }
+//         })
+//     },
 
-    onShippingChange: (data, actions) => {
-        return fetch('/api/order/shipping?country=' + data.shipping_address.country_code + '&item=shirt&promo=' + get_promo_code(), {
-            method: 'get'
-        }).then((res) => {
-            return res.json()
-        }).then((details) => {
-            var shipping_price = details.shipping_price / 100
-            return actions.order.patch([{
-                op: 'replace',
-                path: '/purchase_units/@reference_id==\'default\'/amount',
-                value: {
-                    currency_code: 'USD',
-                    value: ((calculate_pricing().order_total / 100) + shipping_price).toFixed(2),
-                    breakdown: {
-                        item_total: {
-                            currency_code: 'USD',
-                            value: (calculate_pricing().order_total / 100).toFixed(2)
-                        },
-                        shipping: {
-                            currency_code: 'USD',
-                            value: shipping_price.toFixed(2)
-                        }
-                    }
-                }
-            }])
-        })
-    }
-}).render('#paypal_buttons');
+//     onShippingChange: (data, actions) => {
+//         return fetch('/api/order/shipping?country=' + data.shipping_address.country_code + '&item=shirt&promo=' + get_promo_code(), {
+//             method: 'get'
+//         }).then((res) => {
+//             return res.json()
+//         }).then((details) => {
+//             var shipping_price = details.shipping_price / 100
+//             return actions.order.patch([{
+//                 op: 'replace',
+//                 path: '/purchase_units/@reference_id==\'default\'/amount',
+//                 value: {
+//                     currency_code: 'USD',
+//                     value: ((calculate_pricing().order_total / 100) + shipping_price).toFixed(2),
+//                     breakdown: {
+//                         item_total: {
+//                             currency_code: 'USD',
+//                             value: (calculate_pricing().order_total / 100).toFixed(2)
+//                         },
+//                         shipping: {
+//                             currency_code: 'USD',
+//                             value: shipping_price.toFixed(2)
+//                         }
+//                     }
+//                 }
+//             }])
+//         })
+//     }
+// }).render('#paypal_buttons');
