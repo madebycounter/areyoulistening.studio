@@ -70,8 +70,8 @@
     "contact_address": "",
 
     "webhooks": {
-        "order": "https://discordapp.com/api/webhooks/742500476440018995/AqR-KF8i-Q3qRHcVXgBG_RnDejjXTrRVGOkqXI3W4mfXgSnoBIVbtYE4XqHzJkTuLBTc",
-        "error": "https://discordapp.com/api/webhooks/736059673559564323/nGvQiX1d_MjoQ8vhBTeNYd60n7qhoakVbL2Zd7pEI5wm2PP9zXm5uADf8HO-RyYFYC6p"
+        "order": "",
+        "error": ""
     },
 
     "base_url": "",
