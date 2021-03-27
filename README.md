@@ -6,6 +6,8 @@ I doubt anyone will be able to get this code running again (even I struggle- my 
 
 ## Screenshots
 
-![mobile testing](https://gardna.net/f/ayl/mobile2.jpg)
+![mobile testing](https://gardna.net/f/ayl/mobile2.jpg | height=300)
 
 ![checkout](https://gardna.net/f/ayl/mobile1.png)
+
+![marketing showing shirt](https://gardna.net/f/ayl/grass.png)
