@@ -8,6 +8,6 @@ I doubt anyone will be able to get this code running again (even I struggle- my 
 
 ## Screenshots
 
-<img src="https://gardna.net/f/ayl/mobile2.jpg" alt="mobile testing" width="300px">
+<img src="https://gardna.net/f/ayl/mobile2.jpg" alt="mobile testing" width="500px">
 
 ![checkout](https://gardna.net/f/ayl/mobile1.png)
