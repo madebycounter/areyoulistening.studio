@@ -6,7 +6,7 @@ I doubt anyone will be able to get this code running again (even I struggle- my 
 
 ## Screenshots
 
-![mobile testing](https://gardna.net/f/ayl/mobile2.jpg | height=300)
+<img src="https://gardna.net/f/ayl/mobile2.jpg" alt="mobile testing" height="300px">
 
 ![checkout](https://gardna.net/f/ayl/mobile1.png)
 
