@@ -1,6 +1,6 @@
 # areyoulistening.studio
 
-![marketing showing shirt](https://gardna.net/f/ayl/grass.png)
+![marketing showing shirt](https://gardna.net/f/cdn/ayl/grass.png)
 
 [areyoulistening.studio](https://ayl.gardna.net) was a webstore that allowed for users to customize their own t-shirt to feature nine of their favorite albums. It features an adaptive mobile and desktop site, Paypal integration, automatic email receipts and a host of backend tools used for order management. During the months that it was active, we sold over $1500 worth of shirts. Below are some screenshots from the website in various stages of development. For a look at our marketing, check out our Instagram [@areyoulistening.studio](https://www.instagram.com/areyoulistening.studio/).
 
@@ -8,6 +8,6 @@ I doubt anyone will be able to get this code running again (even I struggle- my 
 
 ## Screenshots
 
-<img src="https://gardna.net/f/ayl/mobile2.jpg" alt="mobile testing" width="500px">
+<img src="https://gardna.net/f/cdn/ayl/mobile2.jpg" alt="mobile testing" width="500px">
 
-![checkout](https://gardna.net/f/ayl/mobile1.png)
+![checkout](https://gardna.net/f/cdn/ayl/mobile1.png)
